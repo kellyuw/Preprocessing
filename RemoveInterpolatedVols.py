@@ -1,0 +1,65 @@
+import pandas as pd
+import os, sys
+import subprocess
+import shutil
+from nipype.interfaces.fsl import Merge
+from nipype.interfaces.fsl import Split
+
+subject_dir = str(sys.argv[1])
+bptf = subject_dir + '/rest/Rest_bptf.nii.gz'
+ofile = bptf.replace('bptf','bptf_good_vols')
+
+
+def wait10():
+	wproc = subprocess.Popen(['sleep','10'])
+	wproc.wait()
+
+if os.stat(subject_dir + '/rest/Rest_outlier_vols_with_vol_after.csv').st_size > 1:
+	os.chdir(subject_dir)
+	df = pd.read_csv(subject_dir + '/rest/Rest_outlier_vols_with_vol_after.csv', header = None)
+	outlier_vols = [x for x in df[0]]
+
+	nvols = int(subprocess.check_output(['cat', subject_dir + '/rest/Rest_NumVols.txt']).strip('\n').strip(' ').split('.')[0])
+	tr = int(subprocess.check_output(['cat', subject_dir + '/rest/Rest_TR.txt']).strip('\n').strip(' ').split('.')[0])
+	print(nvols, tr)
+	print(len(outlier_vols))
+	print('Length outliers: ' + str(len(outlier_vols)))
+
+	proc = subprocess.Popen(['fslsplit',str(bptf)])
+	proc.wait()
+
+	s = []
+	for i in range(nvols):
+		if i not in outlier_vols:
+			s += ['vol' + str(i).zfill(4) + '.nii.gz']
+
+	merger = Merge()
+	merger.inputs.in_files = s
+	merger.inputs.dimension = 't'
+	merger.inputs.tr = tr
+	merger.run()
+	wait10()
+
+	for j in s:
+		os.remove(j)
+
+	temp_ofile = os.path.join(subject_dir,s[0].replace('.nii.gz','_merged.nii.gz'))
+
+	if os.path.exists(temp_ofile):
+		os.rename(temp_ofile, 'Rest_bptf_good_vols.nii.gz')
+
+	for regressor in ['csf', 'wm', 'gs']:
+		ifile = subject_dir + '/rest/Rest_' + regressor + '_with_temp_deriv.txt'
+		rofile = ifile.replace('.txt','_good_vols.txt')
+		df = pd.read_csv(ifile, delim_whitespace = True, header = None)
+		gdf = df.ix[[i for i in range(nvols) if i not in outlier_vols]]
+		print(rofile)
+		print(gdf)
+		gdf.to_csv(rofile, index = False, header = False, sep = '\t', float_format='%.6f')
+else:
+#except pd.io.common.EmptyDataError:
+	shutil.copy2(bptf, 'Rest_bptf_good_vols.nii.gz')
+	for regressor in ['csf', 'wm', 'gs']:
+	    ifile2 = subject_dir + '/rest/Rest_' + regressor + '_with_temp_deriv.txt'
+	    rofile2 = ifile2.replace('.txt','_good_vols.txt')
+	    shutil.copyfile(ifile2, rofile2)
