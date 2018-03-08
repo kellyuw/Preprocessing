@@ -32,56 +32,32 @@ if [[ ${FEATDIR} != *stressdevlab* ]]; then
 	exit 1
 fi
 
+#Set ANTSpath
+export ANTSPATH=${ANTSpath}
+SUBJECTDIR=`echo ${FEATDIR} | awk -F "/${TASK}" '{print $1}'`
+
+if [[ ${PROJECT} == *new_memory* ]] || [[ ${PROJECT} == *example* ]] || [[ ${PROJECT} == *VSCA* ]]; then
+	CUSTOM_BRAIN=$MNI_BRAIN
+elif [[ ${PROJECT} == *dep_threat_pipeline* ]]; then
+	CUSTOM_BRAIN="/mnt/stressdevlab/${PROJECT}/Standard/DT_BRAIN.nii.gz"
+	REGPREFIX=`dirname ${CUSTOM_BRAIN}`/`basename ${CUSTOM_BRAIN} .nii.gz`_to_MNI
+elif [[ ${PROJECT} == *fear_pipeline* ]]; then
+	CUSTOM_BRAIN=${LAB_DIR}/${PROJECT}/Template/Final/FINAL-MT_brain.nii.gz
+	REGPREFIX=`dirname ${CUSTOM_BRAIN}`/`basename ${CUSTOM_BRAIN} .nii.gz`_to_MNI_brain
+	fi
+elif [[ ${PROJECT} == *stress_pipeline* ]]; then
+	CUSTOM_BRAIN="${LAB_DIR}/${PROJECT}/Standard/ST_brain.nii.gz"
+	REGPREFIX=`dirname ${CUSTOM_BRAIN}`/`basename ${CUSTOM_BRAIN} .nii.gz`_to_MNI
+fi
+
 #Set other variables
 STDREGDIR=${FEATDIR}/reg_standard/stats
 REGDIR=${FEATDIR}/reg
 STATSDIR=${FEATDIR}/stats
+REGPREFIX=`dirname ${CUSTOM_BRAIN}`/`basename ${CUSTOM_BRAIN} .nii.gz`_to_MNI
+SUBJECT=`basename ${SUBJECTDIR}`
 
-#Set ANTSpath
-export ANTSPATH=${ANTSpath}
-
-
-if [[ ${PROJECT} == *new_memory* ]] || [[ ${PROJECT} == *example* ]] || [[ ${PROJECT} == *VSCA* ]]; then
-	SUBJECT=`echo ${FEATDIR} | awk -F "/" '{print $5}'`
-	SUBJECTDIR=`echo ${PROJECT_DIR}/${SUBJECT}`
-elif [[ ${PROJECT} == *dep_threat_pipeline* ]]; then
-	SUBJECT=`echo ${FEATDIR} | awk -F "/" '{print $5}'`
-	PRESUB=`echo ${FEATDIR} | awk -F "${SUBJECT}" '{print $1}'`
-	SUBJECTDIR=`echo ${PRESUB}/${SUBJECT}`
-	CUSTOM_BRAIN="/mnt/stressdevlab/${PROJECT}/Standard/DT_BRAIN.nii.gz"
-	REGPREFIX=`dirname ${CUSTOM_BRAIN}`/`basename ${CUSTOM_BRAIN} .nii.gz`_to_MNI
-elif [[ ${PROJECT} == *fear_pipeline* ]]; then
-	SUBJECT=`echo ${FEATDIR} | awk -F "/" '{print $6}'`
-	PRESUB=`echo ${FEATDIR} | awk -F "${SUBJECT}" '{print $1}'`
-	SUBJECTDIR=`echo ${PRESUB}/${SUBJECT}`
-	CUSTOM_BRAIN_BRAIN=/mnt/stressdevlab/${PROJECT}/Template/Final/FINAL-MT_brain.nii.gz
-	REGPREFIX=/mnt/stressdevlab/${PROJECT}/Template/Final/FINAL-MT_brain_to_MNI_brain
-	if [[ ${FEATDIR} == *Sep* ]]; then
-	    RUN=`echo ${RUN} | sed 's|_Sep||g'`
-	elif [[ ${FEATDIR} == *ResponseTrials* ]]; then
-		RUN=`echo ${RUN} | sed 's|_ResponseTrials||g'`
-	#elif [[ ${FEATDIR} == *PPI* ]]; then
-	#	REGDIR=
-	fi
-elif [[ ${PROJECT} == *stress_pipeline* ]]; then
-	SUBJECT=`echo ${FEATDIR} | awk -F "/" '{print $6}'`
-	PRESUB=`echo ${FEATDIR} | awk -F "${SUBJECT}" '{print $1}'`
-	SUBJECTDIR=`echo ${PRESUB}/${SUBJECT}`
-	CUSTOM_BRAIN="/mnt/stressdevlab/${PROJECT}/Standard/ST_brain.nii.gz"
-	REGPREFIX=`dirname ${CUSTOM_BRAIN}`/`basename ${CUSTOM_BRAIN} .nii.gz`_to_MNI
-elif [[ ${PROJECT} == *neuropoint* ]]; then
-	SUBJECT=`echo ${FEATDIR} | awk -F "/" '{print $7}'`
-	PRESUB=`echo ${FEATDIR} | awk -F "${SUBJECT}" '{print $1}'`
-	SUBJECTDIR=`echo ${PRESUB}/${SUBJECT}`
-else
-	echo "ERROR: Could not determine subject ID number."
-	exit 1
-fi
-
-echo ${SUBJECT}
-echo ${SUBJECTDIR}
-
-export ANTSPATH=${ANTSpath}
+echo ${SUBJECTDIR} ${SUBJECT}
 
 #Remove ANTSReg flag if exists
 if [[ -f ${FEATDIR}/.ANTSREG ]]; then
@@ -107,9 +83,7 @@ for imagetype in example_func mean_func mask; do
 	else
 		fslmaths ${FEATDIR}/${imagetype}.nii.gz -mas ${TASK}/${RUN}_bet_R_brain_mask.nii.gz ${FEATDIR}/${imagetype}_brain.nii.gz
 		${ANTSpath}/antsApplyTransforms -i ${FEATDIR}/${imagetype}_brain.nii.gz -r ${MNI_BRAIN} -t ${REGPREFIX}_1Warp.nii.gz ${REGPREFIX}_0GenericAffine.mat xfm_dir/T1_to_custom_1Warp.nii.gz xfm_dir/T1_to_custom_0GenericAffine.mat xfm_dir/${TASK}/${RUN}_to_T1_1Warp.nii.gz xfm_dir/${TASK}/${RUN}_to_T1_0GenericAffine.mat -o ${FEATDIR}/reg_standard/${imagetype}.nii.gz
-		${ANTSpath}/antsApplyTransforms -i ${FEATDIR}/${imagetype}.nii.gz -r ${MNI_BRAIN} -t ${REGPREFIX}_1Warp.nii.gz ${REGPREFIX}_0GenericAffine.mat xfm_dir/T1_to_custom_1Warp.nii.gz xfm_dir/T1_to_custom_0GenericAffine.mat xfm_dir/${TASK}/${RUN}_to_T1_1Warp.nii.gz xfm_dir/${TASK}/${RUN}_to_T1_0GenericAffine.mat -o ${FEATDIR}/reg_standard/${imagetype}_orig.nii.gz
 	fi
-
 done
 
 #Register cope images
@@ -121,7 +95,6 @@ for imagetype in cope varcope zstat; do
 			${ANTSpath}/WarpImageMultiTransform 3 ${image} ${STDREGDIR}/`basename ${image}` -R ${MNI_BRAIN} ${NIH_DIR}/NIHtoMNIWarp.nii.gz ${NIH_DIR}/NIHtoMNIAffine.txt ${SUBJECTDIR}/xfm_dir/T1_to_nih_Warp.nii.gz ${SUBJECTDIR}/xfm_dir/T1_to_nih_Affine.txt ${SUBJECTDIR}/xfm_dir/${RUN}_to_T1_ras.txt
 		else
 			${ANTSpath}/antsApplyTransforms -i ${image} -r ${MNI_BRAIN} -t ${REGPREFIX}_1Warp.nii.gz ${REGPREFIX}_0GenericAffine.mat xfm_dir/T1_to_custom_1Warp.nii.gz xfm_dir/T1_to_custom_0GenericAffine.mat xfm_dir/${TASK}/${RUN}_to_T1_1Warp.nii.gz xfm_dir/${TASK}/${RUN}_to_T1_0GenericAffine.mat -o ${STDREGDIR}/`basename ${image}`
-			#${ANTSpath}/WarpImageMultiTransform 3 ${image} ${STDREGDIR}/`basename ${image}` -R ${MNI_BRAIN} ${NIH_DIR}/NIHtoMNIWarp.nii.gz ${NIH_DIR}/NIHtoMNIAffine.txt ${SUBJECTDIR}/xfm_dir/T1_to_nih_Warp.nii.gz ${SUBJECTDIR}/xfm_dir/T1_to_nih_Affine.txt ${SUBJECTDIR}/xfm_dir/${TASK}/${RUN}_to_T1_ras.txt
 		fi
 	done
 done
@@ -139,5 +112,3 @@ echo ${STDREGDIR}/FEtdof_t${num}.nii.gz
 if [[ -f ${STDREGDIR}/FEtdof_t${num}.nii.gz ]]; then
 	touch ${FEATDIR}/.ANTSREG
 fi
-
-#touch "${FEATDIR}/.ANTSREG"
