@@ -44,9 +44,14 @@ elif [[ ${PROJECT} == *dep_threat_pipeline* ]]; then
 elif [[ ${PROJECT} == *fear_pipeline* ]]; then
 	CUSTOM_BRAIN=${LAB_DIR}/${PROJECT}/Template/Final/FINAL-MT_brain.nii.gz
 	REGPREFIX=`dirname ${CUSTOM_BRAIN}`/`basename ${CUSTOM_BRAIN} .nii.gz`_to_MNI_brain
-	fi
 elif [[ ${PROJECT} == *stress_pipeline* ]]; then
 	CUSTOM_BRAIN="${LAB_DIR}/${PROJECT}/Standard/ST_brain.nii.gz"
+	REGPREFIX=`dirname ${CUSTOM_BRAIN}`/`basename ${CUSTOM_BRAIN} .nii.gz`_to_MNI
+elif [[ ${PROJECT} == *HOME_pipeline* ]]; then
+	CUSTOM_BRAIN="${LAB_DIR}/${PROJECT}/Standard/HOME_brain.nii.gz"
+	REGPREFIX=`dirname ${CUSTOM_BRAIN}`/`basename ${CUSTOM_BRAIN} .nii.gz`_to_MNI
+elif [[ ${PROJECT} == *PING* ]]; then
+	CUSTOM_BRAIN="${LAB_DIR}/${PROJECT}/Standard/PING_brain.nii.gz"
 	REGPREFIX=`dirname ${CUSTOM_BRAIN}`/`basename ${CUSTOM_BRAIN} .nii.gz`_to_MNI
 fi
 
