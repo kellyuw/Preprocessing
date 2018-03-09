@@ -5,7 +5,7 @@
 
 if [ $# -lt 3 ]; then
 	echo
-	echo   "bash RegisterANTs.sh <full path to feat directory> <task name> <run name> "
+	echo   "bash RegisterANTs-FEAT.sh <full path to feat directory> <task name> <run name> "
 	echo
 	exit 1
 fi
@@ -30,10 +30,12 @@ REGSTATSDIR=${FEATDIR}/reg_standard/stats
 REGDIR=${FEATDIR}/reg
 STATSDIR=${FEATDIR}/stats
 
+SUBJECTDIR=`echo ${FEATDIR} | awk -F "/${TASK}" '{print $1}'`
+
 if [[ ${FEATDIR} == *PING* ]] || [[ ${FEATDIR} == *HOME_pipeline* ]]; then
-	BRAINMASK=`dirname ${FEATDIR}`/${RUN}_sr_brain.nii.gz
+	BRAINMASK=${SUBJECTDIR}/${RUN}_sr_brain.nii.gz
 else
-	BRAINMASK=`dirname ${FEATDIR}`/${RUN}_bet_R_brain.nii.gz
+	BRAINMASK=${SUBJECTDIR}/${RUN}_bet_R_brain.nii.gz
 fi
 
 #Remove ANTSReg flag if exists
@@ -53,7 +55,6 @@ cp ${SCRIPTSDIR}/selfreg.mat ${REGDIR}/example_func2standard.mat
 #Warp example_func, mean_func, and mask to MNI space
 echo "Warping example_func, mean_func, and mask to MNI space..."
 for imagetype in example_func mean_func mask; do
-
 	fslmaths ${FEATDIR}/${imagetype}.nii.gz -mas ${BRAINMASK} ${FEATDIR}/${imagetype}_brain.nii.gz
 	bash ${SCRIPTSDIR}/RegisterANTs-FuncToMNI-Image.sh ${FEATDIR}/${imagetype}_brain.nii.gz ${TASK} ${RUN} ${FEATDIR}/reg_standard/${imagetype}.nii.gz
 done

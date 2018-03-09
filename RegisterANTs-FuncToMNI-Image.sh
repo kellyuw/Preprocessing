@@ -68,14 +68,17 @@ elif [[ ${PROJECT} == *PING* ]]; then
 	T1_BRAIN=${SUBJECTDIR}/freesurfer/inverseT1_brainmask_brain.nii.gz
 fi
 
+MNIREGPREFIX=`dirname ${CUSTOM_BRAIN}`/`basename ${CUSTOM_BRAIN} .nii.gz`_to_MNI
 if [[ ${PROJECT} == *HOME_pipeline* ]] || [[ ${PROJECT} == *PING* ]]; then
 	FUNCREGPREFIX=${SUBJECTDIR}/xfm_dir/${TASK}/${RUN}_from_inverseT1_sr
 	CUSTOMREGPREFIX=${SUBJECTDIR}/xfm_dir/T1_to_custom
-	MNIREGPREFIX=`dirname ${CUSTOM_BRAIN}`/`basename ${CUSTOM_BRAIN} .nii.gz`_to_MNI
 elif [[ ${PROJECT} == *fear_pipeline* ]]; then
 	FUNCREGPREFIX=${SUBJECTDIR}/xfm_dir/${TASK}/${RUN}_to_T1
 	CUSTOMREGPREFIX=${SUBJECTDIR}/xfm_dir/T1_to_custom
 	MNIREGPREFIX=`dirname ${CUSTOM_BRAIN}`/`basename ${CUSTOM_BRAIN} .nii.gz`_to_MNI_brain
+else
+	FUNCREGPREFIX=${SUBJECTDIR}/xfm_dir/${TASK}/${RUN}_to_T1
+	CUSTOMREGPREFIX=${SUBJECTDIR}/xfm_dir/T1_to_custom
 fi
 
 #Set other variables
