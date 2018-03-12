@@ -3,7 +3,7 @@
 
 if [ $# -lt 2 ]; then
 	echo
-	echo   "bash RegisterANTs-Image.sh <full path to image> <task name> <run name> <output name (optional)>"
+	echo   "bash RegisterANTs-T1ToFunc-MultiLabel.sh <label image> <full path to func image>"
 	echo
 	exit 1
 fi
@@ -34,6 +34,10 @@ RUN=`basename ${FUNC_IMAGE} .nii.gz`
 SUBJECT_DIR=`dirname ${SUBJECT_TASK_DIR}`
 OUTPUT_DIR="${SUBJECT_TASK_DIR}/ROIMasks"
 
+if [[ ${RUN} == *MidVol* ]]; then
+	RUN=`echo ${RUN} | awk -F "_MidVol" '{print $1}'`
+fi
+
 if [ $# -gt 3 ]; then
 	OUTPUT=$3
 else
@@ -42,6 +46,7 @@ fi
 
 if [[ ! -d ${OUTPUT_DIR} ]]; then
 	echo "Making ${OUTPUT_DIR}"
+	mkdir -p ${OUTPUT_DIR}
 fi
 
 #Set ANTSpath
@@ -71,7 +76,7 @@ MNIREGPREFIX=`dirname ${CUSTOM_BRAIN}`/`basename ${CUSTOM_BRAIN} .nii.gz`_to_MNI
 if [[ ${PROJECT} == *HOME_pipeline* ]] || [[ ${PROJECT} == *PING* ]]; then
 	FUNCREGPREFIX=${SUBJECT_DIR}/xfm_dir/${TASK}/${RUN}_from_inverseT1_sr
 	CUSTOMREGPREFIX=${SUBJECT_DIR}/xfm_dir/T1_to_custom
-	FUNC_BRAIN="${SUBJECT_TASK_DIR}/${RUN}_sr_brain.nii.gz"
+	FUNC_BRAIN="${SUBJECT_DIR}/${TASK}/${RUN}_sr_brain.nii.gz"
 elif [[ ${PROJECT} == *fear_pipeline* ]]; then
 	FUNCREGPREFIX=${SUBJECT_DIR}/xfm_dir/${TASK}/${RUN}_to_T1
 	CUSTOMREGPREFIX=${SUBJECT_DIR}/xfm_dir/T1_to_custom
