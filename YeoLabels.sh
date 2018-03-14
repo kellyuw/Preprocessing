@@ -21,6 +21,11 @@ elif [[ ${FS_Dir} == *HOME* ]]; then
 	Project_Dir="/mnt/stressdevlab/HOME_pipeline"
 	Subject_Dir=${Project_Dir}/${Subject}
 	FS_Subject=${Subject}
+elif [[ ${FS_Dir} == *PING* ]]; then
+	Subject=$2
+	Project_Dir="/mnt/stressdevlab/PING/NewRestingState/New"
+	Subject_Dir=${Project_Dir}/${Subject}
+	FS_Subject=${Subject}
 else
 	Subject=$2
 	Project_Dir=`dirname ${FS_Dir}`
@@ -29,7 +34,6 @@ else
 fi
 
 Standard_Dir=${Project_Dir}/Standard
-FS_Dir=${Project_Dir}/raw_FreeSurfer
 
 
 ANTSpath=/usr/local/ANTs-2.1.0-rc3/bin/
