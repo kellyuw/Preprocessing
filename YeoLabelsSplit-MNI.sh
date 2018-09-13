@@ -11,7 +11,7 @@ elif [[ ${ProjectDir} == *stress_pipeline* ]]; then
 	ProjectDir="/mnt/stressdevlab/stress_pipeline/month${Month}"
 fi
 
-ROIs="/mnt/stressdevlab/PING/RestingState/ROIScripts/ROI_Labels.txt"
+ROIs="/mnt/stressdevlab/scripts/Atlases/Yeo_JNeurophysiol11_SplitLabels/MNI152/7Networks.txt"
 NumROIs=`cat ${ROIs} | wc -l`
 
 if [[ ${ProjectDir} == *PING* ]]; then
@@ -23,9 +23,10 @@ mkdir -p ${OutDir}
 
 for i in `seq 1 ${NumROIs}` ; do
 
-	ROI=`head -n ${i} ${ROIs} | tail -n 1`
+	ROI_NAME=`head -n ${i} ${ROIs} | tail -n 1 | awk -F " " '{print $2}'`
+	ROI_NUM=`head -n ${i} ${ROIs} | tail -n 1 | awk -F " " '{print $1}'`
 	echo ${ROI} ${i}
-	fslmaths ${RegisteredLabels} -thr ${i} -uthr ${i} -bin ${OutDir}/${i}_`basename ${ROI}`
+	fslmaths ${RegisteredLabels} -thr ${i} -uthr ${i} -bin ${OutDir}/${i}_${ROI_NAME}.nii.gz
 	
-	fslmeants -i ${ProjectDir}/${Subject}/rest/Rest_final.nii.gz -m ${OutDir}/${i}_`basename ${ROI}` -o ${OutDir}/${i}_`basename ${ROI} .nii.gz`.txt
+	fslmeants -i ${ProjectDir}/${Subject}/rest/Rest_final.nii.gz -m ${OutDir}/${i}_${ROI_NAME}.nii.gz -o ${OutDir}/${i}_${ROI_NAME}.txt
 done

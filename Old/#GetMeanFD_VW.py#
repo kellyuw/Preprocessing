@@ -3,11 +3,11 @@ import os, sys
 
 ifile = str(sys.argv[1])
 
-if 'clean' in ifile:
-    ofile = '/'.join(ifile.split('/')[:-1] + ['Rest_mean_fd_clean.txt'])
+if 'bptf' in ifile:
+    ofile = '/'.join(ifile.split('/')[:-1] + ['RestVW_mean_fd_clean.txt'])
 else:
-    ofile = '/'.join(ifile.split('/')[:-1] + ['Rest_mean_fd_raw.txt'])
-
+    ofile = '/'.join(ifile.split('/')[:-1] + ['RestVW_mean_fd_raw.txt'])
+#else condition above should never happen because it's "post"
 if os.stat(ifile).st_size > 1:
     df = pd.read_csv(ifile, header = None)
     mean_fwd = df.mean(0)[0]

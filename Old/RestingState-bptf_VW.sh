@@ -4,9 +4,9 @@
 #https://webcache.googleusercontent.com/search?q=cache:gVRbKOOCtYEJ:https://www.jiscmail.ac.uk/cgi-bin/webadmin%3FA2%3Dfsl%3B9ffadc97.1109+&cd=1&hl=en&ct=clnk&gl=us
 
 ifile=$1
-bptf_file=`dirname $ifile`/`basename $ifile _no_nuisance.nii.gz`_bptf.nii.gz
-bptf_temp_file=`dirname $ifile`/`basename $ifile _no_nuisance.nii.gz`_bptf_temp.nii.gz
-tmean_file=`dirname $ifile`/`basename $ifile _no_nuisance.nii.gz`_bptf_Tmean.nii.gz
+bptf_file=`dirname $ifile`/`basename $ifile _int_norm.nii.gz`VW_bptf.nii.gz
+bptf_temp_file=`dirname $ifile`/`basename $ifile _int_norm.nii.gz`VW_bptf_temp.nii.gz
+tmean_file=`dirname $ifile`/`basename $ifile _int_norm.nii.gz`VW_bptf_Tmean.nii.gz
 tr=`fslval $1 pixdim4`
 
 #sigma[vol] = filter_width[secs]/(2*TR[secs])
