@@ -34,6 +34,8 @@ SUBJECTDIR=`echo ${FEATDIR} | awk -F "/${TASK}" '{print $1}'`
 
 if [[ ${FEATDIR} == *PING* ]] || [[ ${FEATDIR} == *HOME_pipeline* ]]; then
 	BRAINMASK=${SUBJECTDIR}/${RUN}_sr_brain.nii.gz
+elif [[ ${FEATDIR} == *new_fear_pipeline* ]]; then
+	BRAINMASK=${SUBJECTDIR}/${TASK}/${RUN}_FinalMidVol_brain.nii.gz
 else
 	BRAINMASK=${SUBJECTDIR}/${RUN}_bet_R_brain.nii.gz
 fi
