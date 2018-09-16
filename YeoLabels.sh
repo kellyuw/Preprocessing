@@ -36,7 +36,6 @@ fi
 Standard_Dir=${Project_Dir}/Standard
 
 
-
 ANTSpath=/usr/local/ANTs-2.1.0-rc3/bin/
 
 export ANTSPATH=${ANTSpath}

@@ -17,6 +17,10 @@ elif [[ ${FS_Dir} == *stress_pipeline* ]]; then
 elif [[ ${FS_Dir} == *HOME* ]]; then
 	Subject_Dir=${Project_Dir}/${Subject}
 	FS_Subject=${Subject}
+elif [[ ${FS_Dir} == *PING* ]]; then
+	Project_Dir="/mnt/stressdevlab/PING/NewRestingState/New"
+	Subject_Dir=${Project_Dir}/${Subject}
+	FS_Subject=${Subject}
 else
 	Subject=$2
 	Subject_Dir=${Project_Dir}/${Subject}
