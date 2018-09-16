@@ -1,13 +1,13 @@
 #!/bin/bash -X
 #Register image with ANTs (MNI to func)
+#Uses default interpolation with antsApplyTransforms and fslmaths to threshold at 0.5
 
 if [ $# -lt 2 ]; then
 	echo
-	echo   "bash RegisterANTs-MNIToFunc-Image.sh <full path to MNI image> <full path to func image> <output(optional)>"
+	echo   "bash RegisterANTs-MNIToFunc-Label.sh <full path to MNI image> <full path to func image> <output(optional)>"
 	echo
 	exit 1
 fi
-
 
 MNI_IMAGE=$1
 FUNC_IMAGE=$2
@@ -71,7 +71,7 @@ fi
 
 MNIREGPREFIX=`dirname ${CUSTOM_BRAIN}`/`basename ${CUSTOM_BRAIN} .nii.gz`_to_MNI
 if [[ ${PROJECT} == *HOME_pipeline* ]]; then
-	FUNCREGPREFIX=${SUBJECTDIR}/xfm_dir/${TASK}/${RUN}_from_inverseT1_s
+	FUNCREGPREFIX=${SUBJECTDIR}/xfm_dir/${TASK}/${RUN}_from_inverseT1_sr
 	CUSTOMREGPREFIX=${SUBJECTDIR}/xfm_dir/T1_to_custom
 	FUNC_BRAIN="${SUBJECT_TASK_DIR}/${RUN}_MidVol.nii.gz"
 elif [[ ${PROJECT} == *PING* ]]; then
@@ -106,11 +106,29 @@ pwd
 
 
 if [[ ${PROJECT} == *HOME* ]]; then
-	${ANTSpath}/antsApplyTransforms -i ${MNI_IMAGE} -r ${FUNC_BRAIN} -t ${FUNCREGPREFIX}_1Warp.nii.gz ${FUNCREGPREFIX}_0GenericAffine.mat [${CUSTOMREGPREFIX}_0GenericAffine.mat,1] ${CUSTOMREGPREFIX}_1InverseWarp.nii.gz [${MNIREGPREFIX}_0GenericAffine.mat,1] ${MNIREGPREFIX}_1InverseWarp.nii.gz -o ${OUTPUT}
+	${ANTSpath}/antsApplyTransforms -i ${MNI_IMAGE} -r ${FUNC_BRAIN} -t ${FUNCREGPREFIX}_1Warp.nii.gz ${FUNCREGPREFIX}_0GenericAffine.mat [${CUSTOMREGPREFIX}_0GenericAffine.mat,1] ${CUSTOMREGPREFIX}_1InverseWarp.nii.gz [${MNIREGPREFIX}_0GenericAffine.mat,1] ${MNIREGPREFIX}_1InverseWarp.nii.gz -o `dirname ${OUTPUT}`/`basename ${OUTPUT} .nii.gz`_UNTHR.nii.gz
 elif [[ ${PROJECT} == *fear_pipeline* ]] || [[ ${PROJECT} == *stress_pipeline* ]]; then
-		${ANTSpath}/antsApplyTransforms -i ${MNI_IMAGE} -r ${FUNC_BRAIN} -t [${FUNCREGPREFIX}_0GenericAffine.mat,1] [${CUSTOMREGPREFIX}_0GenericAffine.mat,1] ${CUSTOMREGPREFIX}_1InverseWarp.nii.gz [${MNIREGPREFIX}_0GenericAffine.mat,1] ${MNIREGPREFIX}_1InverseWarp.nii.gz ${INTERP} -o ${OUTPUT}
+		${ANTSpath}/antsApplyTransforms -i ${MNI_IMAGE} -r ${FUNC_BRAIN} -t [${FUNCREGPREFIX}_0GenericAffine.mat,1] [${CUSTOMREGPREFIX}_0GenericAffine.mat,1] ${CUSTOMREGPREFIX}_1InverseWarp.nii.gz [${MNIREGPREFIX}_0GenericAffine.mat,1] ${MNIREGPREFIX}_1InverseWarp.nii.gz -o `dirname ${OUTPUT}`/`basename ${OUTPUT} .nii.gz`_UNTHR.nii.gz
 elif [[ ${PROJECT} == *PING* ]]; then
-	${ANTSpath}/antsApplyTransforms -i ${MNI_IMAGE} -r ${FUNC_BRAIN} -t [${FUNCREGPREFIX},1] [${CUSTOMREGPREFIX}_0GenericAffine.mat,1] ${CUSTOMREGPREFIX}_1InverseWarp.nii.gz [${MNIREGPREFIX}_0GenericAffine.mat,1] ${MNIREGPREFIX}_1InverseWarp.nii.gz ${INTERP} -o ${OUTPUT}
+	${ANTSpath}/antsApplyTransforms -i ${MNI_IMAGE} -r ${FUNC_BRAIN} -t [${FUNCREGPREFIX},1] [${CUSTOMREGPREFIX}_0GenericAffine.mat,1] ${CUSTOMREGPREFIX}_1InverseWarp.nii.gz [${MNIREGPREFIX}_0GenericAffine.mat,1] ${MNIREGPREFIX}_1InverseWarp.nii.gz -o `dirname ${OUTPUT}`/`basename ${OUTPUT} .nii.gz`_UNTHR.nii.gz
+fi
+
+
+fslmaths `dirname ${OUTPUT}`/`basename ${OUTPUT} .nii.gz`_UNTHR.nii.gz -thr 0.5 -bin ${OUTPUT}
+CHECKVAL=`fslstats ${OUTPUT} -V | awk -F " " '{print $1}'`
+if [[ ${CHECKVAL} -lt 1 ]]; then
+	for i in 4 3 2 1; do
+		EXTRA_OUTPUT=`dirname ${OUTPUT}`/`basename ${OUTPUT} .nii.gz`"_THR-0pt${i}.nii.gz"
+		fslmaths `dirname ${OUTPUT}`/`basename ${OUTPUT} .nii.gz`_UNTHR.nii.gz -thr 0.${i} -bin ${EXTRA_OUTPUT}
+		CHECKVAL=`fslstats ${EXTRA_OUTPUT} -V | awk -F " " '{print $1}'`
+		if [[ ${CHECKVAL} -gt 0 ]]; then
+			echo "*********************************** NOTE ***********************************"
+			echo "NON-STANDARD THR USED: 0.${i} ${OUTPUT}"
+			echo "****************************************************************************"
+			cp ${EXTRA_OUTPUT} ${OUTPUT}
+			exit
+		fi
+	done
 fi
 
 #bash ${LAB_DIR}/scripts/Preprocessing/MakeSlicerQA.sh slicer ${OUTPUT} ${FUNC_IMAGE} `dirname ${OUTPUT}`/`basename ${OUTPUT} .nii.gz`.png

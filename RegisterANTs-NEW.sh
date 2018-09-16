@@ -71,7 +71,6 @@ for imagetype in example_func mean_func mask; do
 		bash ${SCRIPTS_DIR}/RegisterANTs-FuncToMNI-Image.sh ${FEATDIR}/${imagetype}_brain.nii.gz ${TASK} ${RUN} ${FEATDIR}/reg_standard/${imagetype}.nii.gz
 done
 
-exit
 #Register cope images
 echo "Registering cope, varcope, and zstat images..."
 for imagetype in cope varcope zstat; do

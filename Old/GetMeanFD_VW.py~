@@ -3,7 +3,7 @@ import os, sys
 
 ifile = str(sys.argv[1])
 
-if 'clean' in ifile:
+if 'bptf' in ifile:
     ofile = '/'.join(ifile.split('/')[:-1] + ['Rest_mean_fd_clean.txt'])
 else:
     ofile = '/'.join(ifile.split('/')[:-1] + ['Rest_mean_fd_raw.txt'])

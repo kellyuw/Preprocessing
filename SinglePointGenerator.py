@@ -19,15 +19,20 @@ outputpercent = str(args.outputpercent)
 
 
 if os.stat(ifile).st_size > 0:
-    df = pd.read_csv(ifile, header = None, delim_whitespace=True)
-    badvols = list(df[0])
-    cols = len(badvols)
-    rows = vols
-    singlepointmat = np.zeros((rows, cols))
+    try:
+        df = pd.read_csv(ifile, header = None, delim_whitespace=True)
+        badvols = list(df[0])
+        cols = len(badvols)
+        rows = vols
+        singlepointmat = np.zeros((rows, cols))
 
-    for i,j in enumerate(badvols):
-        singlepointmat[j-1,i] = 1
-	np.savetxt(output,singlepointmat,fmt='%d',delimiter='\t',newline='\n')
+        for i,j in enumerate(badvols):
+            singlepointmat[j-1,i] = 1
+    	np.savetxt(output,singlepointmat,fmt='%d',delimiter='\t',newline='\n')
+    except pd.io.common.EmptyDataError:
+        cols = 0
+        rows = int(vols)
+        open(output, 'a').close()
 
 else:
     cols = 0

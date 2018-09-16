@@ -63,9 +63,8 @@ fi
 
 #Make yeo_labels directory if it doesn't already exist
 if [[ ! -d ${Subject_Dir}/freesurfer/yeo_labels/LIA_masks ]] ; then
-	echo "Creating ${Subject_Dir}/freesurfer/yeo_labels/LIA_masks"
-	mkdir -p ${Subject_Dir}/freesurfer/yeo_labels/LIA_masks
-	mkdir -p ${Subject_Dir}/freesurfer/yeo_labels/RAS_masks
+	echo "Creating ${Subject_Dir}/freesurfer/yeo_labels"
+	mkdir -p ${Subject_Dir}/freesurfer/yeo_labels
 fi
 
 
@@ -73,10 +72,13 @@ for hemi in lh rh ; do
 	Hemi=`echo ${hemi} | tr [a-z] [A-Z]`
 
 	#Try to get network labels into native space
-	mri_surf2surf --srcsubject fsaverage5 --trgsubject ${FS_Subject} --hemi ${hemi} --sval-annot /mnt/stressdevlab/PING/RestingState/Yeo_Labels/1000subjects_reference/fsaverage5/${hemi}.Yeo2011_7Networks_N1000.split_components.annot --tval `dirname ${FS_Subject_Dir}`/${FS_Subject}/labels2/${hemi}.Yeo2011_7Networks_N1000.annot
+	mri_surf2surf --srcsubject fsaverage5 --trgsubject ${FS_Subject} --hemi ${hemi} --sval-annot /mnt/stressdevlab/scripts/Atlases/Yeo_JNeurophysiol11_SplitLabels/fsaverage5/label/${hemi}.Yeo2011_7Networks_N1000.split_components.annot --tval `dirname ${FS_Subject_Dir}`/${FS_Subject}/labels2/${hemi}.Yeo2011_7Networks_N1000.annot
+	mri_surf2surf --srcsubject fsaverage5 --trgsubject ${FS_Subject} --hemi ${hemi} --sval-annot /mnt/stressdevlab/scripts/Atlases/Yeo_JNeurophysiol11_SplitLabels/fsaverage5/label/${hemi}.Yeo2011_17Networks_N1000.split_components.annot --tval `dirname ${FS_Subject_Dir}`/${FS_Subject}/labels2/${hemi}.Yeo2011_17Networks_N1000.annot
 
 	#Convert annontations to individual labels
 	mri_annotation2label --subject ${FS_Subject} --hemi ${hemi} --outdir ${FS_Subject_Dir}/labels2/${hemi}.Yeo2011_7Networks_N1000.split_components/ --annotation ${FS_Subject_Dir}/labels2/${hemi}.Yeo2011_7Networks_N1000.annot
+	mri_annotation2label --subject ${FS_Subject} --hemi ${hemi} --outdir ${FS_Subject_Dir}/labels2/${hemi}.Yeo2011_17Networks_N1000.split_components/ --annotation ${FS_Subject_Dir}/labels2/${hemi}.Yeo2011_17Networks_N1000.annot
+
 
 	#Make aseg-in-rawavg.mgz if doesn't already exist
 	if [[ ! -f ${FS_Subject_Dir}/labels2/aseg-in-rawavg.mgz ]] ; then
@@ -93,10 +95,27 @@ for hemi in lh rh ; do
 		fi
 
 		#Convert mgz volumes to NIFTI (LIA)
-		if [[ ! -f ${Subject_Dir}/freesurfer/yeo_labels/LIA_masks/${roi_name}.nii.gz ]]; then
-			mri_convert ${FS_Subject_Dir}/labels2/${roi_name}.mgz ${Subject_Dir}/freesurfer/yeo_labels/LIA_masks/${roi_name}.nii.gz
-			fslreorient2std ${Subject_Dir}/freesurfer/yeo_labels/LIA_masks/${roi_name}.nii.gz ${Subject_Dir}/freesurfer/yeo_labels/LIA_masks/${roi_name}.nii.gz
+		if [[ ! -f ${Subject_Dir}/freesurfer/yeo_labels/${roi_name}.nii.gz ]]; then
+			mri_convert ${FS_Subject_Dir}/labels2/${roi_name}.mgz ${Subject_Dir}/freesurfer/yeo_labels/${roi_name}.nii.gz
+			fslreorient2std ${Subject_Dir}/freesurfer/yeo_labels/${roi_name}.nii.gz ${Subject_Dir}/freesurfer/yeo_labels/${roi_name}.nii.gz
 		fi
 	done
+
+	for label in `ls ${FS_Subject_Dir}/labels2/${hemi}.Yeo2011_17Networks_N1000.split_components/*.label`; do
+		roi_name=`basename ${label} .label`
+
+		#Convert labels to volumes
+		if [[ ! -f ${FS_Subject_Dir}/labels2/${roi_name}.mgz ]]; then
+		mri_label2vol --label ${label} --temp ${FS_Subject_Dir}/labels2/aseg-in-rawavg.mgz --reg ${FS_Subject_Dir}/register.dat --proj frac 0 1 .1 --fillthresh 0.5 --hemi ${hemi} --subject ${FS_Subject} --o ${FS_Subject_Dir}/labels2/${roi_name}.mgz
+		fi
+
+		#Convert mgz volumes to NIFTI (LIA)
+		if [[ ! -f ${Subject_Dir}/freesurfer/yeo_labels/${roi_name}.nii.gz ]]; then
+			mri_convert ${FS_Subject_Dir}/labels2/${roi_name}.mgz ${Subject_Dir}/freesurfer/yeo_labels/${roi_name}.nii.gz
+			fslreorient2std ${Subject_Dir}/freesurfer/yeo_labels/${roi_name}.nii.gz ${Subject_Dir}/freesurfer/yeo_labels/${roi_name}.nii.gz
+		fi
+
+	done
+
 done
 exit

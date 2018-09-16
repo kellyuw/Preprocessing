@@ -6,7 +6,7 @@
 	echo "Usage: "
 	echo " ibicIDSN <File> <tr> "
 	echo "         Note: Two parameters required -- don't forget the TR"
-	}	
+	}
 
 if [ $# -lt 2 ]; then
 	clear
@@ -23,27 +23,29 @@ if [ ! -e ${1} ] ; then
 	echo ====================================
 	echo The file ${1} does not exist
 	echo ====================================
-	echo 
+	echo
 	USAGE ;
 	exit
 fi
 
 file=${1}
 tr=${2}
+temp_dir=`mktemp -d /tmp/tmp.IDSNXXXXX`
+#temp_dir="/tmp/tmp.IDSN29tUk/"
 home=`pwd`
 
-tmpdir=`mktemp -d /tmp/ibicIDSN-XXXXX`
-cp ${file} ${tmpdir}/
-cd ${tmpdir}
+echo "Making images in temp dir: ${temp_dir}"
+cd ${temp_dir}
+cp ${file} ${temp_dir}
 
 echo Generating a tissue mask...
-fslsplit `basename ${file}` split_vol
+fslsplit ${file} split_vol
 
 for vol in split_vol*; do
-    bet ${vol} `basename $vol`_brain -f 0.3
+	bet ${vol} `basename $vol`_brain -f 0.3
 done
 
-fslmerge -t all_vols_brain `ls split_vol*brain*` 
+fslmerge -t all_vols_brain `ls split_vol*brain*`
 
 fslmaths all_vols_brain -Tmean vol0_brain
 
@@ -51,7 +53,7 @@ fslmaths vol0_brain.nii.gz -bin -kernel gauss 12 -ero -ero vol0_brain_e2.nii.gz
 
 fslmaths vol0_brain_e2.nii.gz -kernel gauss 15 -dilM -dilM -dilM vol0_brain_e2d3
 
-rm all_vols_brain* 
+rm all_vols_brain*
 rm split_vol*
 rm vol0_brain.nii.gz
 rm vol0_brain_e2.nii.gz
@@ -81,31 +83,32 @@ fslmaths max_func.nii.gz  -mul tissue_mask.nii.gz backgroundimage
 fslmaths ${file} -mul OutOfBodyMask.nii.gz OutOfBodyData
 
 echo Running Melodic to generate components...
-melodic -i OutOfBodyData.nii.gz -o `dirname ${file}`/`basename ${file} .nii.gz`_OutOfBody.ica --bgimage=backgroundimage.nii.gz --nomask --nobet --tr=2 --mmthresh=0.5 --report
+melodic -i OutOfBodyData.nii.gz -o `basename ${file} .nii.gz`_OutOfBody.ica --bgimage=backgroundimage.nii.gz --nomask --nobet --tr=2 --mmthresh=0.5 --report
 
 rm max_func.nii.gz tissue_mask.nii.gz backgroundimage.nii.gz max_brain.nii.gz OutOfBodyMask.nii.gz OutOfBodyData.nii.gz
 
 echo Identifying Spikes
 
-if [ -f `dirname ${file}`/`basename ${file} .nii.gz`_SN_all_outliers.txt ]; then rm `dirname ${file}`/`basename ${file} .nii.gz`_SN_all_outliers.txt; fi
+if [ -f `basename ${file} .nii.gz`_SN_all_outliers.txt ]; then rm `basename ${file} .nii.gz`_SN_all_outliers.txt; fi
 
-for component in `dirname ${file}`/`basename ${file} .nii.gz`_OutOfBody.ica/report/t[0-9]*.txt
+echo 'Start looking for components!'
+for component in `basename ${file} .nii.gz`_OutOfBody.ica/report/t[0-9]*.txt
 do
     row=0
     echo Working on component $component
     for line in `cat $component`
-    do 
-	if (( $(echo "$line" | awk '{ print ($1 > 6 || $1 < -6)}') )) 
+    do
+	if (( $(echo "$line" | awk '{ print ($1 > 6 || $1 < -6)}') ))
 	then
-		echo $row is an outlier	    
-		echo $row >> `dirname ${file}`/`basename ${file} .nii.gz`_SN_all_outliers.txt 
+		echo $row is an outlier
+		echo $row >> `basename ${file} .nii.gz`_SN_all_outliers.txt
 	fi
 	row=$(($row + 1))
     done
 done
+touch `basename ${file} .nii.gz`_SN_all_outliers.txt
 
-sort -nu `dirname ${file}`/`basename ${file} .nii.gz`_SN_all_outliers.txt > `dirname ${file}`/`basename ${file} .nii.gz`_SN_outliers.txt 
-rm `dirname ${file}`/`basename ${file} .nii.gz`_SN_all_outliers.txt
+cat `basename ${file} .nii.gz`_SN_all_outliers.txt | sort -nu | tee `dirname ${file}`/`basename ${file} .nii.gz`_all_SN_outliers.txt
+rm `basename ${file} .nii.gz`_SN_all_outliers.txt
 
-if [[ -d ${tmpdir} ]]; then rm -r ${tmpdir} ; fi
 cd $home
