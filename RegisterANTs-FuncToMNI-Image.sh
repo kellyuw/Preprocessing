@@ -39,6 +39,7 @@ echo "TASK: ${TASK}"
 echo "RUN: ${RUN}"
 echo "PROJECT: ${PROJECT}"
 
+
 #Set ANTSpath
 export ANTSPATH=${ANTSpath}
 if [[ ${IMAGE} == *xfm_dir* ]]; then
@@ -51,6 +52,9 @@ if [[ ${PROJECT} == *new_memory* ]] || [[ ${PROJECT} == *example* ]] || [[ ${PRO
 	CUSTOM_BRAIN=$MNI_BRAIN
 elif [[ ${PROJECT} == *dep_threat_pipeline* ]]; then
 	CUSTOM_BRAIN="/mnt/stressdevlab/${PROJECT}/Standard/DT_BRAIN.nii.gz"
+elif [[ ${PROJECT} == *new_fear_pipeline* ]]; then
+	T1_BRAIN=${SUBJECTDIR}/${TASK}/${RUN}_FinalMidVol_brain.nii.gz
+	CUSTOM_BRAIN=${LAB_DIR}/${PROJECT}/Template/Final/FINAL-MT_brain.nii.gz
 elif [[ ${PROJECT} == *fear_pipeline* ]]; then
 	if [[ `basename ${SUBJECTDIR}` == *session* ]]; then
 		SUBJECT=`dirname ${SUBJECTDIR} | awk -F "/fear_pipeline/" '{print $2}'`
@@ -81,19 +85,10 @@ MNIREGPREFIX=`dirname ${CUSTOM_BRAIN}`/`basename ${CUSTOM_BRAIN} .nii.gz`_to_MNI
 if [[ ${PROJECT} == *HOME_pipeline* ]]; then
 	FUNCREGPREFIX=${SUBJECTDIR}/xfm_dir/${TASK}/${RUN}_from_inverseT1_s
 	CUSTOMREGPREFIX=${SUBJECTDIR}/xfm_dir/T1_to_custom
-elif [[ ${PROJECT} == *PING* ]]; then
-	FUNCREGPREFIX=${SUBJECTDIR}/xfm_dir/rest/EPIREG-Rest_to_T1_fs_ras
+elif [[ ${PROJECT} == *new_fear_pipeline* ]]; then
+	FUNCREGPREFIX=${SUBJECTDIR}/xfm_dir/${TASK}/${RUN}_to_T1_s
 	CUSTOMREGPREFIX=${SUBJECTDIR}/xfm_dir/T1_to_custom_s
-elif [[ ${PROJECT} == *stress_pipeline* ]]; then
 	MNIREGPREFIX=`dirname ${CUSTOM_BRAIN}`/`basename ${CUSTOM_BRAIN} .nii.gz`_to_MNI_brain
-	if [[ ${IMAGE} == *NEW_ANTs* ]]; then
-		FUNCREGPREFIX=${SUBJECTDIR}/xfm_dir/${TASK}/${RUN}_to_T1_r
-		CUSTOMREGPREFIX=${SUBJECTDIR}/xfm_dir/T1_AVG_to_custom_s
-	else
-		FUNCREGPREFIX=${SUBJECTDIR}/xfm_dir/${TASK}/${RUN}_to_T1_r
-		CUSTOMREGPREFIX=${SUBJECTDIR}/xfm_dir/T1_to_custom_s
-	fi
-
 elif [[ ${PROJECT} == *fear_pipeline* ]]; then
 	if [[ ${TASK} == *rest* ]]; then
 		FUNCREGPREFIX=${SUBJECTDIR}/xfm_dir/${TASK}/${RUN}_to_T1_r
@@ -114,6 +109,19 @@ fi
 
 #Set other variables
 SUBJECT=`basename ${SUBJECTDIR}`
+
+if [[ ${PROJECT} == *new_fear_pipeline* ]]; then
+	if [[ `basename ${SUBJECTDIR}` == *session* ]]; then
+		SUBJECT=`echo ${SUBJECTDIR} | awk -F "new_fear_pipeline/" '{print $2}' | awk -F "/" '{print $1}'`
+		SESSION=`echo ${SUBJECTDIR} | awk -F "new_fear_pipeline/" '{print $2}'` | awk -F "/" '{print $2}'
+		SUBJECTDIR=${LAB_DIR}/${PROJECT}/${SUBJECT}/${SESSION}
+	else
+		SUBJECT=`echo ${SUBJECTDIR} | awk -F "new_fear_pipeline/" '{print $2}'` | awk -F "/" '{print $2}'
+		SESSION=`echo ${SUBJECTDIR} | awk -F "new_fear_pipeline/" '{print $2}'` | awk -F "/" '{print $1}'
+		SUBJECTDIR=${LAB_DIR}/${PROJECT}/${SUBJECT}/${SESSION}
+	fi
+fi
+
 cd ${SUBJECTDIR}
 echo ${SUBJECTDIR} ${SUBJECT}
 pwd
