@@ -12,21 +12,9 @@ idir = os.path.dirname(rest_f)
 
 if os.stat(outliers_f).st_size > 1:
 	outliers = pd.read_csv(outliers_f, header = None)[0]
-	print(outliers)
 	nvols = int(subprocess.check_output(['fslval', rest_f, 'dim4']).strip('\n').strip(' '))
 
-	combined = sorted([int(n) for n in set(outliers)])
-	combined_plus_one = [int(n) + 1 for n in combined if (int(n)+1) < nvols]
-	combined_plus_one_with_combined = sorted(set(combined + combined_plus_one))
-	with file(idir + '/Rest_outlier_vols_with_vol_after.csv','w') as ofile:
-	    for line in combined_plus_one_with_combined:
-		ofile.write(str(line) + '\n')
-	with file(idir + '/Rest_NumBadVols.txt','w') as ofile:
-	    ofile.write(str(len(combined_plus_one_with_combined)) + '\n')
-	print(combined_plus_one_with_combined)
-
 	subprocess.check_call(['fslsplit', rest_f])
-	outliers = combined_plus_one_with_combined
 
 	#Get lists of outlier sequences
 	for k,g in groupby(enumerate(outliers), lambda (i,x):i-x):
@@ -59,9 +47,4 @@ if os.stat(outliers_f).st_size > 1:
 	    os.remove(f)
 else:
 	nvols = int(subprocess.check_output(['fslval', rest_f, 'dim4']).strip('\n').strip(' '))
-
-	with file(idir + '/Rest_outlier_vols_with_vol_after.csv','w') as ofile:
-	    ofile.write('\n')
-	with file(idir + '/Rest_NumBadVols.txt','w') as ofile:
-	    ofile.write('0 ' + '\n')
 	subprocess.check_call(['cp', rest_f, idir + '/Rest_scrubbed.nii.gz'])

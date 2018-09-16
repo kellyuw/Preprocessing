@@ -7,7 +7,7 @@ from nipype.interfaces.fsl import Split
 
 subject_dir = str(sys.argv[1])
 outlier_vols_file = str(sys.argv[2])
-bptf = subject_dir + '/rest/Rest_bptf.nii.gz'
+bptf = subject_dir + '/rest/RestVW_bptf.nii.gz'
 ofile = bptf.replace('bptf','bptf_good_vols')
 
 
@@ -47,19 +47,5 @@ if os.stat(outlier_vols_file).st_size > 1:
 	temp_ofile = os.path.join(subject_dir,s[0].replace('.nii.gz','_merged.nii.gz'))
 
 	if os.path.exists(temp_ofile):
-		os.rename(temp_ofile, 'Rest_bptf_good_vols.nii.gz')
+		os.rename(temp_ofile, 'RestVW_bptf_good_vols.nii.gz')
 
-	#for regressor in ['csf', 'wm', 'gs']:
-	#	ifile = subject_dir + '/rest/Rest_' + regressor + '_with_temp_deriv.txt'
-	#	rofile = ifile.replace('.txt','_good_vols.txt')
-	#	df = pd.read_csv(ifile, delim_whitespace = True, header = None)
-	#	gdf = df.ix[[i for i in range(nvols) if i not in outlier_vols]]
-	#	print(gdf)
-	#	gdf.to_csv(rofile, index = False, header = False, sep = '\t', float_format='%.6f')
-else:
-#except pd.io.common.EmptyDataError:
-	shutil.copy2(bptf, 'Rest_bptf_good_vols.nii.gz')
-	#for regressor in ['csf', 'wm', 'gs']:
-	#    ifile2 = subject_dir + '/rest/Rest_' + regressor + '_with_temp_deriv.txt'
-	#    rofile2 = ifile2.replace('.txt','_good_vols.txt')
-	#    shutil.copyfile(ifile2, rofile2)

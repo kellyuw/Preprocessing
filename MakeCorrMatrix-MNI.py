@@ -5,9 +5,10 @@ import os, sys
 subject_dir = sys.argv[1]
 subject = str(subject_dir.split('/')[-1])
 project_dir = os.path.dirname(subject_dir)
-
-warped_roi_ts = glob.glob(subject_dir + '/rest/yeo_labels/*h.7Networks*.txt')
-custom_roi_ts = glob.glob(subject_dir + '/rest/custom_labels/*.txt')
+#warped_roi_ts = glob.glob(subject_dir + '/xfm_dir/rest/yeo_labels/*h.7Networks*.txt')
+#custom_roi_ts = glob.glob(subject_dir + '/xfm_dir/rest/custom_labels/*.txt')
+warped_roi_ts = glob.glob(subject_dir + '/rest/ROIMasks/yeo_labels/*h.7Networks*.txt')
+custom_roi_ts = []
 
 
 ordered_cols = ['LH_Cont_Cing',
@@ -62,20 +63,20 @@ ordered_cols = ['LH_Cont_Cing',
 'LH_SomMot',
 'RH_SomMot']
 
-if len(custom_roi_ts) > 0:
-    warped_roi_ts += custom_roi_ts
+#if len(custom_roi_ts) > 0:
+#    warped_roi_ts += custom_roi_ts
 
-ordered_cols += [os.path.basename(x).split('.txt')[0] for x in glob.glob(subject_dir + '/rest/custom_labels/*.txt')]
+#ordered_cols += [os.path.basename(x).split('.txt')[0] for x in glob.glob(subject_dir + '/xfm_dir/rest/custom_labels/*.txt')]
 
 def get_roi_df(x):
     if x not in custom_roi_ts:
         print(x)
         print(len(x.split('_')))
-        if len(os.path.basename(x).split('_')) == 4:
-            yeo_type, roi_hemi, roi_network, roi_raw_region = os.path.basename(x).split('_')
+        if len(os.path.basename(x).split('_')) == 5:
+            roi_num, yeo_type, roi_hemi, roi_network, roi_raw_region = os.path.basename(x).split('_')
             name = '_'.join([roi_hemi, roi_network, roi_raw_region.replace('.txt','')])
-        elif len(os.path.basename(x).split('_')) == 3:
-            yeo_type, roi_hemi, roi_network = os.path.basename(x).split('_')
+        elif len(os.path.basename(x).split('_')) == 4:
+            roi_num, yeo_type, roi_hemi, roi_network = os.path.basename(x).split('_')
             name = '_'.join([roi_hemi, roi_network.replace('.txt','')])
     else:
         name = os.path.basename(x).replace('.txt','')
@@ -85,4 +86,6 @@ def get_roi_df(x):
 t = pd.concat([get_roi_df(x) for x in warped_roi_ts], axis = 1)
 c = t[ordered_cols].corr(method = 'pearson', min_periods = 1)
 ofile = subject_dir + '/' + str(sys.argv[2])
+#else:
+#    ofile = subject_dir + '/rest/Rest_yeo_corr_matrix.csv'
 c.to_csv(ofile)

@@ -34,7 +34,6 @@ LABDIR="/mnt/stressdevlab"
 PROJECT=`echo ${FEATDIR} | awk -F "stressdevlab/" '{print $2}' | awk -F "/" '{print $1}'`
 SCRIPTSDIR="${LABDIR}/scripts/Preprocessing"
 MNI_BRAIN=${FSLDIR}/data/standard/MNI152_T1_2mm_brain.nii.gz
-MNI_BRAIN_MASK="/mnt/stressdevlab/scripts/Atlases/FSLMNI/MNI152_T1_2mm_filled_brain_mask.nii.gz"
 
 #Check FEATDIR to make sure it is full path, instead of relative
 if [[ ${FEATDIR} != *stressdevlab* ]]; then
@@ -43,28 +42,16 @@ if [[ ${FEATDIR} != *stressdevlab* ]]; then
 fi
 
 #Set other variables
-REGSTATSDIR="${FEATDIR}/reg_standard/stats"
-REGDIR="${FEATDIR}/reg"
-STATSDIR="${FEATDIR}/stats"
-
-echo "STATSDIR = ${STATSDIR}"
+REGSTATSDIR=${FEATDIR}/reg_standard/stats
+REGDIR=${FEATDIR}/reg
+STATSDIR=${FEATDIR}/stats
 
 SUBJECTDIR=`echo ${FEATDIR} | awk -F "/${TASK}" '{print $1}'`
 
 if [[ ${FEATDIR} == *HOME_pipeline* ]]; then
 	BRAINMASK=${SUBJECTDIR}/${TASK}/${RUN}_sr_brain.nii.gz
 elif [[ ${FEATDIR} == *PING* ]]; then
-	BRAINMASK=${SUBJECTDIR}/${TASK}/${RUN}_FinalMidVol_brainmask.nii.gz
-elif [[ ${FEATDIR} == *stress_pipeline* ]]; then
-        BRAINMASK=${SUBJECTDIR}/${TASK}/${RUN}_FinalMidVol_bet_R_brain_mask.nii.gz
-elif [[ ${FEATDIR} == *fear_pipeline* ]]; then
-	if [[ ${TASK} == *rest* ]]; then
-        	BRAINMASK=${SUBJECTDIR}/${TASK}/${RUN}_FinalMidVol_bet_R_brain_mask.nii.gz
-	else
-        	BRAINMASK=${SUBJECTDIR}/${TASK}/${RUN}_bet_R_brain_mask.nii.gz
-	fi
-elif [[ ${FEATDIR} == *VSCA* ]]; then
-	BRAINMASK=${SUBJECTDIR}/new_xfm_dir/${TASK}/${RUN}_brain_from_T1_r.nii.gz
+	BRAINMASK=${SUBJECTDIR}/${TASK}/${RUN}_MidVol_brainmask.nii.gz
 else
 	BRAINMASK=${SUBJECTDIR}/${TASK}/${RUN}_bet_R_brain.nii.gz
 fi
@@ -72,7 +59,7 @@ fi
 #Remove ANTSReg flag if exists
 if [[ -f ${FEATDIR}/.ANTSREG ]]; then
 	rm "${FEATDIR}/.ANTSREG"
-fi
+fibash ./RegisterANTs-FEAT.sh /mnt/stressdevlab/fear_pipeline/1001/session1/rest/ROIMasks/Amygdala_bl_Harvard-Oxford_thr50_binarized.feat rest Rest
 
 
 #Make directories for registration
@@ -93,8 +80,7 @@ done
 #Register cope images
 echo "Registering cope, varcope, and zstat images..."
 for imagetype in cope varcope zstat; do
-	for image in `ls ${STATSDIR}/${imagetype}*.nii.gz`; do
-		echo "${image}"
+	for image in ${STATSDIR}/${imagetype}*.nii.gz; do
 		bash ${SCRIPTSDIR}/RegisterANTs-FuncToMNI-Image.sh ${image} ${TASK} ${RUN} ${REGSTATSDIR}/`basename ${image}`
 	done
 done
@@ -102,7 +88,7 @@ done
 #Make dof
 echo "Making dof images..."
 dof=${STATSDIR}/dof; num=0;
-for cope in `ls ${REGSTATSDIR}/cope*.nii.gz`; do
+for cope in ${REGSTATSDIR}/cope*.nii.gz; do
 	num=$((num+1))
 	fslmaths ${cope} -mul 0 -add `cat $dof` ${REGSTATSDIR}/FEtdof_t${num}.nii.gz
 done
@@ -110,9 +96,5 @@ done
 #Leave flag when registration finishes
 echo ${REGSTATSDIR}/FEtdof_t${num}.nii.gz
 if [[ -f ${REGSTATSDIR}/FEtdof_t${num}.nii.gz ]]; then
-	if [[ ${PROJECT} != *stress* ]]; then
-		touch ${FEATDIR}/.ANTSREG
-	else
-		touch ${FEATDIR}/.NEWANTSREG
-	fi
+	touch ${FEATDIR}/.ANTSREG
 fi
