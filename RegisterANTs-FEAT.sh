@@ -57,6 +57,8 @@ elif [[ ${FEATDIR} == *PING* ]]; then
 	BRAINMASK=${SUBJECTDIR}/${TASK}/${RUN}_FinalMidVol_brainmask.nii.gz
 elif [[ ${FEATDIR} == *stress_pipeline* ]]; then
         BRAINMASK=${SUBJECTDIR}/${TASK}/${RUN}_FinalMidVol_bet_R_brain_mask.nii.gz
+elif [[ ${FEATDIR} == *new_fear_pipeline* ]]; then
+	BRAINMASK=${SUBJECTDIR}/${TASK}/${RUN}_FinalMidVol_brain.nii.gz
 elif [[ ${FEATDIR} == *fear_pipeline* ]]; then
 	if [[ ${TASK} == *rest* ]]; then
         	BRAINMASK=${SUBJECTDIR}/${TASK}/${RUN}_FinalMidVol_bet_R_brain_mask.nii.gz
