@@ -132,6 +132,8 @@ if [[ ${PROJECT} == *HOME* ]]; then
 	${ANTSpath}/antsApplyTransforms -i ${IMAGE} -r ${MNI_BRAIN_MASK} -t ${MNIREGPREFIX}_1Warp.nii.gz ${MNIREGPREFIX}_0GenericAffine.mat ${CUSTOMREGPREFIX}_1Warp.nii.gz ${CUSTOMREGPREFIX}_0GenericAffine.mat [${FUNCREGPREFIX}_0GenericAffine.mat,1] ${FUNCREGPREFIX}_1InverseWarp.nii.gz -o ${OUTPUT}
 elif [[ ${PROJECT} == *PING* ]]; then
 	${ANTSpath}/antsApplyTransforms -i ${IMAGE} -r ${MNI_BRAIN_MASK} -t ${MNIREGPREFIX}_1Warp.nii.gz ${MNIREGPREFIX}_0GenericAffine.mat ${CUSTOMREGPREFIX}_1Warp.nii.gz ${CUSTOMREGPREFIX}_0GenericAffine.mat ${FUNCREGPREFIX}.txt -o ${OUTPUT}
+elif [[ ${PROJECT} == *new_fear_pipeline* ]]; then
+	${ANTSpath}/antsApplyTransforms -i ${IMAGE} -r ${MNI_BRAIN_MASK} -t ${MNIREGPREFIX}_1Warp.nii.gz ${MNIREGPREFIX}_0GenericAffine.mat ${CUSTOMREGPREFIX}_1Warp.nii.gz ${CUSTOMREGPREFIX}_0GenericAffine.mat ${FUNCREGPREFIX}_1Warp.nii.gz ${FUNCREGPREFIX}_0GenericAffine.mat -o ${OUTPUT}
 elif [[ ${PROJECT} == *fear_pipeline* ]] || [[ ${PROJECT} == *VSCA* ]] ; then
 	${ANTSpath}/antsApplyTransforms -i ${IMAGE} -r ${MNI_BRAIN_MASK} -t ${MNIREGPREFIX}_1Warp.nii.gz ${MNIREGPREFIX}_0GenericAffine.mat ${CUSTOMREGPREFIX}_1Warp.nii.gz ${CUSTOMREGPREFIX}_0GenericAffine.mat ${FUNCREGPREFIX}_0GenericAffine.mat -o ${OUTPUT}
 #lif [[ ${PROJECT} == *VSCA* ]]; then
