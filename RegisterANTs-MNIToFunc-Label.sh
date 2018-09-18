@@ -53,6 +53,9 @@ if [[ ${PROJECT} == *new_memory* ]] || [[ ${PROJECT} == *example* ]] || [[ ${PRO
 elif [[ ${PROJECT} == *dep_threat_pipeline* ]]; then
 	FUNC_BRAIN=${SUBJECTDIR}/${TASK}/${RUN}_bet_R_brain.nii.gz
 	CUSTOM_BRAIN="/mnt/stressdevlab/${PROJECT}/Standard/DT_BRAIN.nii.gz"
+elif [[ ${PROJECT} == *new_fear_pipeline* ]]; then
+	FUNC_BRAIN=${SUBJECTDIR}/${TASK}/${RUN}_FinalMidVol_brain.nii.gz
+	CUSTOM_BRAIN=${LAB_DIR}/${PROJECT}/Template/Final/FINAL-MT_brain.nii.gz
 elif [[ ${PROJECT} == *fear_pipeline* ]]; then
 	CUSTOM_BRAIN=${LAB_DIR}/${PROJECT}/Template/Final/FINAL-MT_brain.nii.gz
 	T1_BRAIN=${SUBJECTDIR}/freesurfer/T1_bet_R_brain.nii.gz
@@ -78,6 +81,10 @@ elif [[ ${PROJECT} == *PING* ]]; then
 	FUNCREGPREFIX=${SUBJECTDIR}/xfm_dir/rest/EPIREG-Rest_to_T1_fs_ras.txt
 	CUSTOMREGPREFIX=${SUBJECTDIR}/xfm_dir/T1_to_custom_sr
 	FUNC_BRAIN="${SUBJECT_TASK_DIR}/${RUN}_FinalMidVol_brain.nii.gz"
+elif [[ ${PROJECT} == *new_fear_pipeline* ]]; then
+	FUNCREGPREFIX=${SUBJECTDIR}/xfm_dir/${TASK}/${RUN}_to_T1_s
+	CUSTOMREGPREFIX=${SUBJECTDIR}/xfm_dir/T1_to_custom_s
+	MNIREGPREFIX=`dirname ${CUSTOM_BRAIN}`/`basename ${CUSTOM_BRAIN} .nii.gz`_to_MNI_brain
 elif [[ ${PROJECT} == *fear_pipeline* ]]; then
 	if [[ ${TASK} == *rest* ]]; then
 		FUNCREGPREFIX=${SUBJECTDIR}/xfm_dir/${TASK}/${RUN}_to_T1_r
@@ -107,6 +114,8 @@ pwd
 
 if [[ ${PROJECT} == *HOME* ]]; then
 	${ANTSpath}/antsApplyTransforms -i ${MNI_IMAGE} -r ${FUNC_BRAIN} -t ${FUNCREGPREFIX}_1Warp.nii.gz ${FUNCREGPREFIX}_0GenericAffine.mat [${CUSTOMREGPREFIX}_0GenericAffine.mat,1] ${CUSTOMREGPREFIX}_1InverseWarp.nii.gz [${MNIREGPREFIX}_0GenericAffine.mat,1] ${MNIREGPREFIX}_1InverseWarp.nii.gz -o `dirname ${OUTPUT}`/`basename ${OUTPUT} .nii.gz`_UNTHR.nii.gz
+elif [[ ${PROJECT} == *new_fear_pipeline* ]]; then
+	${ANTSpath}/antsApplyTransforms -i ${MNI_IMAGE} -r ${FUNC_BRAIN} -t [${FUNCREGPREFIX}_0GenericAffine.mat,1] ${FUNCREGPREFIX}_1InverseWarp.nii.gz [${CUSTOMREGPREFIX}_0GenericAffine.mat,1] ${CUSTOMREGPREFIX}_1InverseWarp.nii.gz [${MNIREGPREFIX}_0GenericAffine.mat,1] ${MNIREGPREFIX}_1InverseWarp.nii.gz -o `dirname ${OUTPUT}`/`basename ${OUTPUT} .nii.gz`_UNTHR.nii.gz
 elif [[ ${PROJECT} == *fear_pipeline* ]] || [[ ${PROJECT} == *stress_pipeline* ]]; then
 		${ANTSpath}/antsApplyTransforms -i ${MNI_IMAGE} -r ${FUNC_BRAIN} -t [${FUNCREGPREFIX}_0GenericAffine.mat,1] [${CUSTOMREGPREFIX}_0GenericAffine.mat,1] ${CUSTOMREGPREFIX}_1InverseWarp.nii.gz [${MNIREGPREFIX}_0GenericAffine.mat,1] ${MNIREGPREFIX}_1InverseWarp.nii.gz -o `dirname ${OUTPUT}`/`basename ${OUTPUT} .nii.gz`_UNTHR.nii.gz
 elif [[ ${PROJECT} == *PING* ]]; then
