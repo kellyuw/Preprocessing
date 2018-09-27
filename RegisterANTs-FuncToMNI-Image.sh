@@ -93,11 +93,11 @@ SUBJECT=`basename ${SUBJECTDIR}`
 if [[ ${PROJECT} == *new_fear_pipeline* ]]; then
 	if [[ `basename ${SUBJECTDIR}` == *session* ]]; then
 		SUBJECT=`echo ${SUBJECTDIR} | awk -F "new_fear_pipeline/" '{print $2}' | awk -F "/" '{print $1}'`
-		SESSION=`echo ${SUBJECTDIR} | awk -F "new_fear_pipeline/" '{print $2}'` | awk -F "/" '{print $2}'
+		SESSION=`echo ${SUBJECTDIR} | awk -F "new_fear_pipeline/" '{print $2}' | awk -F "/" '{print $2}'`
 		SUBJECTDIR=${LAB_DIR}/${PROJECT}/${SUBJECT}/${SESSION}
 	else
-		SUBJECT=`echo ${SUBJECTDIR} | awk -F "new_fear_pipeline/" '{print $2}'` | awk -F "/" '{print $2}'
-		SESSION=`echo ${SUBJECTDIR} | awk -F "new_fear_pipeline/" '{print $2}'` | awk -F "/" '{print $1}'
+		SUBJECT=`echo ${SUBJECTDIR} | awk -F "new_fear_pipeline/" '{print $2}' | awk -F "/" '{print $2}'`
+		SESSION=`echo ${SUBJECTDIR} | awk -F "new_fear_pipeline/" '{print $2}' | awk -F "/" '{print $1}'`
 		SUBJECTDIR=${LAB_DIR}/${PROJECT}/${SUBJECT}/${SESSION}
 	fi
 fi
@@ -105,11 +105,11 @@ fi
 if [[ ${PROJECT} == *stress_pipeline* ]]; then
 	if [[ `basename ${SUBJECTDIR}` == *month* ]]; then
 		SUBJECT=`echo ${SUBJECTDIR} | awk -F "stress_pipeline/" '{print $2}' | awk -F "/" '{print $1}'`
-		MONTH=`echo ${SUBJECTDIR} | awk -F "stress_pipeline/" '{print $2}'` | awk -F "/" '{print $2}'
+		MONTH=`echo ${SUBJECTDIR} | awk -F "stress_pipeline/" '{print $2}' | awk -F "/" '{print $2}'`
 		SUBJECTDIR=${LAB_DIR}/${PROJECT}/${SUBJECT}/${MONTH}
 	else
-		SUBJECT=`echo ${SUBJECTDIR} | awk -F "stress_pipeline/" '{print $2}'` | awk -F "/" '{print $2}'
-		MONTH=`echo ${SUBJECTDIR} | awk -F "stress_pipeline/" '{print $2}'` | awk -F "/" '{print $1}'
+		SUBJECT=`echo ${SUBJECTDIR} | awk -F "stress_pipeline/" '{print $2}' | awk -F "/" '{print $2}'`
+		MONTH=`echo ${SUBJECTDIR} | awk -F "stress_pipeline/" '{print $2}' | awk -F "/" '{print $1}'`
 		SUBJECTDIR=${LAB_DIR}/${PROJECT}/${SUBJECT}/${MONTH}
 	fi
 fi
