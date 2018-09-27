@@ -55,20 +55,9 @@ elif [[ ${PROJECT} == *dep_threat_pipeline* ]]; then
 elif [[ ${PROJECT} == *new_fear_pipeline* ]]; then
 	T1_BRAIN=${SUBJECTDIR}/${TASK}/${RUN}_FinalMidVol_brain.nii.gz
 	CUSTOM_BRAIN=${LAB_DIR}/${PROJECT}/Template/Final/FINAL-MT_brain.nii.gz
-elif [[ ${PROJECT} == *fear_pipeline* ]]; then
-	if [[ `basename ${SUBJECTDIR}` == *session* ]]; then
-		SUBJECT=`dirname ${SUBJECTDIR} | awk -F "/fear_pipeline/" '{print $2}'`
-		SUBJECTDIR=${LAB_DIR}/${PROJECT}/`basename ${SUBJECTDIR}`/${SUBJECT}
-	fi
-	T1_BRAIN=${SUBJECTDIR}/${TASK}/${RUN}_bet_R_brain.nii.gz
-	CUSTOM_BRAIN=${LAB_DIR}/${PROJECT}/Template/Final/FINAL-MT_brain.nii.gz
 elif [[ ${PROJECT} == *stress_pipeline* ]]; then
-	if [[ `basename ${SUBJECTDIR}` == *month* ]]; then
-		SUBJECT=`dirname ${SUBJECTDIR} | awk -F "/stress_pipeline/" '{print $2}'`
-		SUBJECTDIR=${LAB_DIR}/${PROJECT}/`basename ${SUBJECTDIR}`/${SUBJECT}
-	fi
-	CUSTOM_BRAIN="${LAB_DIR}/${PROJECT}/Template/ST_brain.nii.gz"
-	T1_BRAIN=${SUBJECTDIR}/${TASK}/${RUN}_bet_R_brain.nii.gz
+	T1_BRAIN=${SUBJECTDIR}/${TASK}/${RUN}_FinalMidVol_brain.nii.gz
+	CUSTOM_BRAIN=${LAB_DIR}/${PROJECT}/Template/Final/FINAL-MT_brain.nii.gz
 elif [[ ${PROJECT} == *HOME_pipeline* ]]; then
 	CUSTOM_BRAIN="${LAB_DIR}/${PROJECT}/Standard/HOME_brain.nii.gz"
 	T1_BRAIN=${SUBJECTDIR}/${TASK}/${RUN}_inverseT1_brainmask_brain.nii.gz
@@ -85,18 +74,9 @@ MNIREGPREFIX=`dirname ${CUSTOM_BRAIN}`/`basename ${CUSTOM_BRAIN} .nii.gz`_to_MNI
 if [[ ${PROJECT} == *HOME_pipeline* ]]; then
 	FUNCREGPREFIX=${SUBJECTDIR}/xfm_dir/${TASK}/${RUN}_from_inverseT1_s
 	CUSTOMREGPREFIX=${SUBJECTDIR}/xfm_dir/T1_to_custom
-elif [[ ${PROJECT} == *new_fear_pipeline* ]]; then
+elif [[ ${PROJECT} == *new_fear_pipeline* ]] || [[ ${PROJECT} == *stress_pipeline* ]]; then
 	FUNCREGPREFIX=${SUBJECTDIR}/xfm_dir/${TASK}/${RUN}_to_T1_s
 	CUSTOMREGPREFIX=${SUBJECTDIR}/xfm_dir/T1_to_custom_s
-	MNIREGPREFIX=`dirname ${CUSTOM_BRAIN}`/`basename ${CUSTOM_BRAIN} .nii.gz`_to_MNI_brain
-elif [[ ${PROJECT} == *fear_pipeline* ]]; then
-	if [[ ${TASK} == *rest* ]]; then
-		FUNCREGPREFIX=${SUBJECTDIR}/xfm_dir/${TASK}/${RUN}_to_T1_r
-		CUSTOMREGPREFIX=${SUBJECTDIR}/xfm_dir/T1_to_custom_s
-	else
-		FUNCREGPREFIX=${SUBJECTDIR}/xfm_dir/${TASK}/${RUN}_to_T1
-		CUSTOMREGPREFIX=${SUBJECTDIR}/xfm_dir/T1_to_custom
-	fi
 	MNIREGPREFIX=`dirname ${CUSTOM_BRAIN}`/`basename ${CUSTOM_BRAIN} .nii.gz`_to_MNI_brain
 elif [[ ${PROJECT} == *VSCA* ]]; then
 	MNIREGPREFIX=${LAB_DIR}/${PROJECT}/Standard/VSCA_optiBET_brain_to_MNI_brain
@@ -122,6 +102,18 @@ if [[ ${PROJECT} == *new_fear_pipeline* ]]; then
 	fi
 fi
 
+if [[ ${PROJECT} == *stress_pipeline* ]]; then
+	if [[ `basename ${SUBJECTDIR}` == *month* ]]; then
+		SUBJECT=`echo ${SUBJECTDIR} | awk -F "stress_pipeline/" '{print $2}' | awk -F "/" '{print $1}'`
+		SESSION=`echo ${SUBJECTDIR} | awk -F "stress_pipeline/" '{print $2}'` | awk -F "/" '{print $2}'
+		SUBJECTDIR=${LAB_DIR}/${PROJECT}/${SUBJECT}/${MONTH}
+	else
+		SUBJECT=`echo ${SUBJECTDIR} | awk -F "stress_pipeline/" '{print $2}'` | awk -F "/" '{print $2}'
+		SESSION=`echo ${SUBJECTDIR} | awk -F "stress_pipeline/" '{print $2}'` | awk -F "/" '{print $1}'
+		SUBJECTDIR=${LAB_DIR}/${PROJECT}/${SUBJECT}/${MONTH}
+	fi
+fi
+
 cd ${SUBJECTDIR}
 echo ${SUBJECTDIR} ${SUBJECT}
 pwd
@@ -132,18 +124,12 @@ if [[ ${PROJECT} == *HOME* ]]; then
 	${ANTSpath}/antsApplyTransforms -i ${IMAGE} -r ${MNI_BRAIN_MASK} -t ${MNIREGPREFIX}_1Warp.nii.gz ${MNIREGPREFIX}_0GenericAffine.mat ${CUSTOMREGPREFIX}_1Warp.nii.gz ${CUSTOMREGPREFIX}_0GenericAffine.mat [${FUNCREGPREFIX}_0GenericAffine.mat,1] ${FUNCREGPREFIX}_1InverseWarp.nii.gz -o ${OUTPUT}
 elif [[ ${PROJECT} == *PING* ]]; then
 	${ANTSpath}/antsApplyTransforms -i ${IMAGE} -r ${MNI_BRAIN_MASK} -t ${MNIREGPREFIX}_1Warp.nii.gz ${MNIREGPREFIX}_0GenericAffine.mat ${CUSTOMREGPREFIX}_1Warp.nii.gz ${CUSTOMREGPREFIX}_0GenericAffine.mat ${FUNCREGPREFIX}.txt -o ${OUTPUT}
-elif [[ ${PROJECT} == *new_fear_pipeline* ]]; then
+elif [[ ${PROJECT} == *new_fear_pipeline* ]] || [[ ${PROJECT} == *stress_pipeline* ]]; then
 	${ANTSpath}/antsApplyTransforms -i ${IMAGE} -r ${MNI_BRAIN_MASK} -t ${MNIREGPREFIX}_1Warp.nii.gz ${MNIREGPREFIX}_0GenericAffine.mat ${CUSTOMREGPREFIX}_1Warp.nii.gz ${CUSTOMREGPREFIX}_0GenericAffine.mat ${FUNCREGPREFIX}_1Warp.nii.gz ${FUNCREGPREFIX}_0GenericAffine.mat -o ${OUTPUT}
 elif [[ ${PROJECT} == *fear_pipeline* ]] || [[ ${PROJECT} == *VSCA* ]] ; then
 	${ANTSpath}/antsApplyTransforms -i ${IMAGE} -r ${MNI_BRAIN_MASK} -t ${MNIREGPREFIX}_1Warp.nii.gz ${MNIREGPREFIX}_0GenericAffine.mat ${CUSTOMREGPREFIX}_1Warp.nii.gz ${CUSTOMREGPREFIX}_0GenericAffine.mat ${FUNCREGPREFIX}_0GenericAffine.mat -o ${OUTPUT}
 #lif [[ ${PROJECT} == *VSCA* ]]; then
 #	${ANTSpath}/antsApplyTransforms -i ${IMAGE} -r ${MNI_BRAIN_MASK} -t ${MNIREGPREFIX}_1Warp.nii.gz ${MNIREGPREFIX}_0GenericAffine.mat ${CUSTOMREGPREFIX}_1Warp.nii.gz ${CUSTOMREGPREFIX}_0GenericAffine.mat ${FUNCREGPREFIX}_0GenericAffine.mat -o ${OUTPUT}
-elif [[ ${PROJECT} == *stress_pipeline* ]]; then
-	if [[ ${IMAGE} == *NEW_ANTs* ]]; then
-		${ANTSpath}/antsApplyTransforms -i ${IMAGE} -r ${MNI_BRAIN_MASK} -t ${MNIREGPREFIX}_1Warp.nii.gz ${MNIREGPREFIX}_0GenericAffine.mat ${CUSTOMREGPREFIX}_1Warp.nii.gz ${CUSTOMREGPREFIX}_0GenericAffine.mat ${SUBJECTDIR}/xfm_dir/T1_to_T1_AVG_r_0GenericAffine.mat ${FUNCREGPREFIX}_0GenericAffine.mat -o ${OUTPUT}
-	else
-		${ANTSpath}/antsApplyTransforms -i ${IMAGE} -r ${MNI_BRAIN_MASK} -t ${MNIREGPREFIX}_1Warp.nii.gz ${MNIREGPREFIX}_0GenericAffine.mat ${CUSTOMREGPREFIX}_1Warp.nii.gz ${CUSTOMREGPREFIX}_0GenericAffine.mat ${FUNCREGPREFIX}_0GenericAffine.mat -o ${OUTPUT}
-	fi
 fi
 
 #bash ${LAB_DIR}/scripts/Preprocessing/MakeSlicerQA.sh slicer `dirname ${IMAGE}`/`basename ${IMAGE} .nii.gz`_in_MNI_space.nii.gz ${MNI_BRAIN} `dirname ${IMAGE}`/`basename ${IMAGE} .nii.gz`_in_MNI_space.gif

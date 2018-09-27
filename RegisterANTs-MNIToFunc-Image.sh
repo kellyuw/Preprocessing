@@ -57,9 +57,9 @@ elif [[ ${PROJECT} == *fear_pipeline* ]]; then
 	CUSTOM_BRAIN=${LAB_DIR}/${PROJECT}/Template/Final/FINAL-MT_brain.nii.gz
 	T1_BRAIN=${SUBJECTDIR}/freesurfer/T1_bet_R_brain.nii.gz
 elif [[ ${PROJECT} == *stress_pipeline* ]]; then
-	FUNC_BRAIN=${SUBJECTDIR}/${TASK}/${RUN}_bet_R_brain.nii.gz
+	FUNC_BRAIN=${SUBJECTDIR}/${TASK}/${RUN}_FinalMidVol_brain.nii.gz
 	CUSTOM_BRAIN="${LAB_DIR}/${PROJECT}/Template/ST_brain.nii.gz"
-	T1_BRAIN=${SUBJECTDIR}/freesurfer/T1_bet_R_brain.nii.gz
+	T1_BRAIN=${SUBJECTDIR}/freesurfer/T1_brain.nii.gz
 elif [[ ${PROJECT} == *HOME_pipeline* ]]; then
 	CUSTOM_BRAIN="${LAB_DIR}/${PROJECT}/Standard/HOME_brain.nii.gz"
 	T1_BRAIN=${SUBJECTDIR}/${TASK}/${RUN}_inverseT1_brainmask_brain.nii.gz
