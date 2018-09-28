@@ -112,9 +112,5 @@ done
 #Leave flag when registration finishes
 echo ${REGSTATSDIR}/FEtdof_t${num}.nii.gz
 if [[ -f ${REGSTATSDIR}/FEtdof_t${num}.nii.gz ]]; then
-	if [[ ${PROJECT} != *stress* ]]; then
-		touch ${FEATDIR}/.ANTSREG
-	else
-		touch ${FEATDIR}/.NEWANTSREG
-	fi
+	touch ${FEATDIR}/.ANTSREG
 fi
