@@ -48,13 +48,16 @@ else
 	SUBJECTDIR=`echo ${IMAGE} | awk -F "/${TASK}" '{print $1}'`
 fi
 
-if [[ ${PROJECT} == *new_memory* ]] || [[ ${PROJECT} == *example* ]] || [[ ${PROJECT} == *VSCA* ]]; then
+if [[ ${PROJECT} == *new_memory* ]] || [[ ${PROJECT} == *example* ]]; then
 	CUSTOM_BRAIN=$MNI_BRAIN
 elif [[ ${PROJECT} == *dep_threat_pipeline* ]]; then
 	CUSTOM_BRAIN="/mnt/stressdevlab/${PROJECT}/Standard/DT_BRAIN.nii.gz"
 elif [[ ${PROJECT} == *new_fear_pipeline* ]]; then
 	T1_BRAIN=${SUBJECTDIR}/${TASK}/${RUN}_FinalMidVol_brain.nii.gz
 	CUSTOM_BRAIN=${LAB_DIR}/${PROJECT}/Template/Final/FINAL-MT_brain.nii.gz
+elif [[ ${PROJECT} == *VSCA* ]]; then
+	T1_BRAIN=${SUBJECTDIR}/${TASK}/${RUN}_FinalMidVol_brain.nii.gz
+	CUSTOM_BRAIN=${LAB_DIR}/${PROJECT}/VSCA/Standard/VSCA_brain.nii.gz
 elif [[ ${PROJECT} == *stress_pipeline* ]]; then
 	T1_BRAIN=${SUBJECTDIR}/${TASK}/${RUN}_FinalMidVol_brain.nii.gz
 	CUSTOM_BRAIN=${LAB_DIR}/${PROJECT}/Template/ST_brain.nii.gz
@@ -74,14 +77,10 @@ MNIREGPREFIX=`dirname ${CUSTOM_BRAIN}`/`basename ${CUSTOM_BRAIN} .nii.gz`_to_MNI
 if [[ ${PROJECT} == *HOME_pipeline* ]]; then
 	FUNCREGPREFIX=${SUBJECTDIR}/xfm_dir/${TASK}/${RUN}_from_inverseT1_s
 	CUSTOMREGPREFIX=${SUBJECTDIR}/xfm_dir/T1_to_custom
-elif [[ ${PROJECT} == *new_fear_pipeline* ]] || [[ ${PROJECT} == *stress_pipeline* ]]; then
+elif [[ ${PROJECT} == *new_fear_pipeline* ]] || [[ ${PROJECT} == *stress_pipeline* ]] || [[ ${PROJECT} == *VSCA* ]]; then
 	FUNCREGPREFIX=${SUBJECTDIR}/xfm_dir/${TASK}/${RUN}_to_T1_s
 	CUSTOMREGPREFIX=${SUBJECTDIR}/xfm_dir/T1_to_custom_s
 	MNIREGPREFIX=`dirname ${CUSTOM_BRAIN}`/`basename ${CUSTOM_BRAIN} .nii.gz`_to_MNI_brain
-elif [[ ${PROJECT} == *VSCA* ]]; then
-	MNIREGPREFIX=${LAB_DIR}/${PROJECT}/Standard/VSCA_optiBET_brain_to_MNI_brain
-	FUNCREGPREFIX="${SUBJECTDIR}/new_xfm_dir/${TASK}/${RUN}_to_T1_r"
-	CUSTOMREGPREFIX="${SUBJECTDIR}/new_xfm_dir/T1_to_custom_s"
 else
 	FUNCREGPREFIX=${SUBJECTDIR}/xfm_dir/${TASK}/${RUN}_to_T1
 	CUSTOMREGPREFIX=${SUBJECTDIR}/xfm_dir/T1_to_custom

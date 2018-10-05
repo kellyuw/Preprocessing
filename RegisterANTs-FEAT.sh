@@ -66,7 +66,7 @@ elif [[ ${FEATDIR} == *fear_pipeline* ]]; then
         	BRAINMASK=${SUBJECTDIR}/${TASK}/${RUN}_bet_R_brain_mask.nii.gz
 	fi
 elif [[ ${FEATDIR} == *VSCA* ]]; then
-	BRAINMASK=${SUBJECTDIR}/new_xfm_dir/${TASK}/${RUN}_brain_from_T1_r.nii.gz
+	BRAINMASK=${SUBJECTDIR}/${TASK}/${RUN}_FinalMidVol_brain.nii.gz
 else
 	BRAINMASK=${SUBJECTDIR}/${TASK}/${RUN}_bet_R_brain.nii.gz
 fi
