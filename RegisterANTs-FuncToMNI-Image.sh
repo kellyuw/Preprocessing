@@ -58,6 +58,7 @@ elif [[ ${PROJECT} == *new_fear_pipeline* ]]; then
 		CUSTOM_BRAIN=${LAB_DIR}/${PROJECT}/Template/Final/FINAL-MT_brain.nii.gz
 	elif [[ ${IMAGE} == *session2* ]]; then
 		CUSTOM_BRAIN=${LAB_DIR}/${PROJECT}/Template2/Final/FINAL-MT2_brain.nii.gz
+	fi
 elif [[ ${PROJECT} == *VSCA* ]]; then
 	T1_BRAIN=${SUBJECTDIR}/${TASK}/${RUN}_FinalMidVol_brain.nii.gz
 	CUSTOM_BRAIN=${LAB_DIR}/${PROJECT}/Standard/VSCA_brain.nii.gz
