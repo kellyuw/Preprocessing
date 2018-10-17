@@ -54,7 +54,10 @@ elif [[ ${PROJECT} == *dep_threat_pipeline* ]]; then
 	CUSTOM_BRAIN="/mnt/stressdevlab/${PROJECT}/Standard/DT_BRAIN.nii.gz"
 elif [[ ${PROJECT} == *new_fear_pipeline* ]]; then
 	T1_BRAIN=${SUBJECTDIR}/${TASK}/${RUN}_FinalMidVol_brain.nii.gz
-	CUSTOM_BRAIN=${LAB_DIR}/${PROJECT}/Template/Final/FINAL-MT_brain.nii.gz
+	if [[ ${IMAGE} == *session1* ]]; then
+		CUSTOM_BRAIN=${LAB_DIR}/${PROJECT}/Template/Final/FINAL-MT_brain.nii.gz
+	elif [[ ${IMAGE} == *session2* ]]; then
+		CUSTOM_BRAIN=${LAB_DIR}/${PROJECT}/Template2/Final/FINAL-MT2_brain.nii.gz
 elif [[ ${PROJECT} == *VSCA* ]]; then
 	T1_BRAIN=${SUBJECTDIR}/${TASK}/${RUN}_FinalMidVol_brain.nii.gz
 	CUSTOM_BRAIN=${LAB_DIR}/${PROJECT}/Standard/VSCA_brain.nii.gz
@@ -68,9 +71,6 @@ elif [[ ${PROJECT} == *PING* ]]; then
 	PROJECT="PING/NewRestingState/New"
 	CUSTOM_BRAIN="${LAB_DIR}/${PROJECT}/SaveStudySpecificTemplate/PING_brain.nii.gz"
 	T1_BRAIN=${SUBJECTDIR}/freesurfer/inverseT1_brainmask_brain.nii.gz
-elif [[ ${PROJECT} == *VSCA* ]]; then
-	CUSTOM_BRAIN="${LAB_DIR}/${PROJECT}/Standard/VSCA_optiBET_brain.nii.gz"
-	T1_BRAIN="${SUBJECTDIR}/mprage/T1_brain.nii.gz"
 fi
 
 MNIREGPREFIX=`dirname ${CUSTOM_BRAIN}`/`basename ${CUSTOM_BRAIN} .nii.gz`_to_MNI
