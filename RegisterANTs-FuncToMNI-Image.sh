@@ -11,6 +11,7 @@ fi
 IMAGE=$1
 TASK=$2
 RUN=$3
+ANTSpath=/usr/local/ANTs-2.1.0-rc3/bin/
 
 if [ $# -gt 3 ]; then
 OUTPUT=$4
