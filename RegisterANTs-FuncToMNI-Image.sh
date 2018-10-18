@@ -19,7 +19,6 @@ else
 	OUTPUT=`dirname ${IMAGE}`/`basename ${IMAGE} .nii.gz`_in_MNI_space.nii.gz
 fi
 
-
 #Check IMAGE to make sure it is full path, instead of relative
 if [[ ${IMAGE} != *stressdevlab* ]]; then
 	echo "ERROR: Please include full path to image"
@@ -45,8 +44,7 @@ echo ${SUBJECTDIR} ${SUBJECT}
 pwd
 
 echo "Warping ${IMAGE} to MNI"
-echo "${ANTSpath}/antsApplyTransforms -i ${IMAGE} -r ${MNI_BRAIN_MASK} -t ${MNI_REG_PREFIX}_1Warp.nii.gz ${MNI_REG_PREFIX}_0GenericAffine.mat ${CUSTOM_REG_PREFIX}_1Warp.nii.gz ${CUSTOM_REG_PREFIX}_0GenericAffine.mat ${FUNC_REG_PREFIX}_1Warp.nii.gz ${FUNC_REG_PREFIX}_0GenericAffine.mat -o ${OUTPUT}"
-
+#echo "${ANTSpath}/antsApplyTransforms -i ${IMAGE} -r ${MNI_BRAIN_MASK} -t ${MNI_REG_PREFIX}_1Warp.nii.gz ${MNI_REG_PREFIX}_0GenericAffine.mat ${CUSTOM_REG_PREFIX}_1Warp.nii.gz ${CUSTOM_REG_PREFIX}_0GenericAffine.mat ${FUNC_REG_PREFIX}_1Warp.nii.gz ${FUNC_REG_PREFIX}_0GenericAffine.mat -o ${OUTPUT}"
 ${ANTSpath}/antsApplyTransforms -i ${IMAGE} -r ${MNI_BRAIN_MASK} -t ${MNI_REG_PREFIX}_1Warp.nii.gz ${MNI_REG_PREFIX}_0GenericAffine.mat ${CUSTOM_REG_PREFIX}_1Warp.nii.gz ${CUSTOM_REG_PREFIX}_0GenericAffine.mat ${FUNC_REG_PREFIX}_1Warp.nii.gz ${FUNC_REG_PREFIX}_0GenericAffine.mat -o ${OUTPUT}
 
 
