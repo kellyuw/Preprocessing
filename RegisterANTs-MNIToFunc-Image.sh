@@ -64,7 +64,7 @@ fi
 
 ${ANTSpath}/antsApplyTransforms -i ${MNI_IMAGE} -r ${FUNC_BRAIN} -t [${FUNC_REG_PREFIX}_0GenericAffine.mat,1] ${FUNC_REG_PREFIX}_1InverseWarp.nii.gz [${CUSTOM_REG_PREFIX}_0GenericAffine.mat,1] ${CUSTOM_REG_PREFIX}_1InverseWarp.nii.gz [${MNI_REG_PREFIX}_0GenericAffine.mat,1] ${MNI_REG_PREFIX}_1InverseWarp.nii.gz -o ${OUTPUT}
 
-${ANTSpath}/antsApplyTransforms -i ${MNI_IMAGE} -r ${FUNC_BRAIN} -t  [${CUSTOM_REG_PREFIX}_0GenericAffine.mat,1] ${CUSTOM_REG_PREFIX}_1InverseWarp.nii.gz [${MNI_REG_PREFIX}_0GenericAffine.mat,1] ${MNI_REG_PREFIX}_1InverseWarp.nii.gz -o `dirname ${T1_BRAIN}`/`basename ${MNI_IMAGE} .nii.gz`_in_T1_space.nii.gz
+${ANTSpath}/antsApplyTransforms -i ${MNI_IMAGE} -r ${T1_BRAIN} -t  [${CUSTOM_REG_PREFIX}_0GenericAffine.mat,1] ${CUSTOM_REG_PREFIX}_1InverseWarp.nii.gz [${MNI_REG_PREFIX}_0GenericAffine.mat,1] ${MNI_REG_PREFIX}_1InverseWarp.nii.gz -o `dirname ${T1_BRAIN}`/`basename ${MNI_IMAGE} .nii.gz`_in_T1_space.nii.gz
 
 exit
 
