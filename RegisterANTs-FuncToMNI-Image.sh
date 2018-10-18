@@ -29,6 +29,7 @@ fi
 PROJECT_DIR=$(echo ${IMAGE} | awk -F "/" '{print $1"/"$2"/"$3"/"$4}')
 if [[ ${IMAGE} == *session* ]] || [[ ${IMAGE} == *month* ]]; then
   PROJECT_DIR=$(echo ${IMAGE} | awk -F "/" '{print $1"/"$2"/"$3"/"$4"/"$6}')
+	SUBJECT=$(echo ${IMAGE} | awk -F "/" '{print $5}')
 fi
 
 MNI_BRAIN_MASK="/mnt/stressdevlab/scripts/Atlases/FSLMNI/MNI152_T1_2mm_filled_brain_mask.nii.gz"
@@ -37,8 +38,9 @@ CUSTOM_BRAIN=$(cat ${PROJECT_DIR}/ProjectInfo.txt | grep CUSTOM_BRAIN | awk -F "
 CUSTOM_REG_PREFIX=$(cat ${PROJECT_DIR}/ProjectInfo.txt | grep CUSTOM_REG_PREFIX | awk -F "=" '{print $2}')
 FUNC_BRAIN=$(cat ${PROJECT_DIR}/ProjectInfo.txt | grep FUNC_BRAIN | awk -F "=" '{print $2}' | sed -e "s|TASK|${TASK}|g" -e "s|RUN|${RUN}|g")
 FUNC_REG_PREFIX=$(cat ${PROJECT_DIR}/ProjectInfo.txt | grep FUNC_REG_PREFIX | awk -F "=" '{print $2}' | sed -e "s|TASK|${TASK}|g" -e "s|RUN|${RUN}|g")
+SUBJECT_DIR=${PROJECT_DIR}/${SUBJECT}
 
-cd ${SUBJECTDIR}
+cd ${SUBJECT_DIR}
 echo ${SUBJECTDIR} ${SUBJECT}
 pwd
 
