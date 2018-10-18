@@ -8,9 +8,14 @@ if [ $# -lt 2 ]; then
 	exit 1
 fi
 
+#Set ANTSpath
+ANTSpath=/usr/local/ANTs-2.1.0-rc3/bin/
+export ANTSPATH=${ANTSpath}
 
 MNI_IMAGE=$1
 FUNC_IMAGE=$2
+
+MNI_BRAIN=${FSLDIR}/data/standard/MNI152_T1_2mm_brain.nii.gz
 
 #Check FUNC_IMAGE to make sure it is full path, instead of relative
 if [[ ${FUNC_IMAGE} != *stressdevlab* ]]; then
@@ -18,22 +23,32 @@ if [[ ${FUNC_IMAGE} != *stressdevlab* ]]; then
 	exit 1
 fi
 
-#Set other vars
-LAB_DIR="/mnt/stressdevlab"
-PROJECT=`echo ${FUNC_IMAGE} | awk -F "stressdevlab/" '{print $2}' | awk -F "/" '{print $1}'`
-PROJECT_DIR="${LAB_DIR}/${PROJECT}"
-ANTSpath=/usr/local/ANTs-2.1.0-rc3/bin/
-MNI_BRAIN=${FSLDIR}/data/standard/MNI152_T1_2mm_brain.nii.gz
-MNI=${FSLDIR}/data/standard/MNI152_T1_2mm.nii.gz
-
-echo "FUNC_IMAGE: ${FUNC_IMAGE}"
-echo "PROJECT: ${PROJECT}"
+if [[ ${FUNC_IMAGE} == *session* ]] || [[ ${FUNC_IMAGE} == *month* ]]; then
+  PROJECT_DIR=$(echo ${FUNC_IMAGE} | awk -F "/" '{print $1"/"$2"/"$3"/"$4"/"$6}')
+	SUBJECT=$(echo ${FUNC_IMAGE} | awk -F "/" '{print $5}')
+else
+	PROJECT_DIR=$(echo ${FUNC_IMAGE} | awk -F "/" '{print $1"/"$2"/"$3"/"$4}')
+	SUBJECT=$(echo ${FUNC_IMAGE} | awk -F "/" '{print $5}')
+fi
 
 SUBJECT_TASK_DIR=`dirname ${FUNC_IMAGE}`
 TASK=`basename ${SUBJECT_TASK_DIR}`
 RUN=`basename ${FUNC_IMAGE} .nii.gz`
-SUBJECTDIR=`dirname ${SUBJECT_TASK_DIR}`
+SUBJECT_DIR=`dirname ${SUBJECT_TASK_DIR}`
 OUTPUT_DIR="${SUBJECT_TASK_DIR}/ROIMasks"
+MNI_BRAIN_MASK="/mnt/stressdevlab/scripts/Atlases/FSLMNI/MNI152_T1_2mm_filled_brain_mask.nii.gz"
+MNI_REG_PREFIX=$(cat ${PROJECT_DIR}/ProjectInfo.txt | grep MNI_REG_PREFIX | awk -F "=" '{print $2}')
+CUSTOM_BRAIN=$(cat ${PROJECT_DIR}/ProjectInfo.txt | grep CUSTOM_BRAIN | awk -F "=" '{print $2}')
+CUSTOM_REG_PREFIX=$(cat ${PROJECT_DIR}/ProjectInfo.txt | grep CUSTOM_REG_PREFIX | awk -F "=" '{print $2}')
+FUNC_BRAIN=$(cat ${PROJECT_DIR}/ProjectInfo.txt | grep FUNC_BRAIN | awk -F "=" '{print $2}' | sed -e "s|TASK|${TASK}|g" -e "s|RUN|${RUN}|g")
+FUNC_REG_PREFIX=$(cat ${PROJECT_DIR}/ProjectInfo.txt | grep FUNC_REG_PREFIX | awk -F "=" '{print $2}' | sed -e "s|TASK|${TASK}|g" -e "s|RUN|${RUN}|g")
+SUBJECT_DIR=${PROJECT_DIR}/${SUBJECT}
+
+cd ${SUBJECT_DIR}
+echo ${SUBJECTDIR} ${SUBJECT}
+echo "FUNC_IMAGE: ${FUNC_IMAGE}"
+echo "PROJECT: ${PROJECT}"
+pwd
 
 if [ $# -gt 2 ]; then
 	OUTPUT=$3
@@ -45,8 +60,11 @@ if [[ ! -d ${OUTPUT_DIR} ]]; then
 	echo "Making ${OUTPUT_DIR}"
 fi
 
-#Set ANTSpath
-export ANTSPATH=${ANTSpath}
+
+${ANTSpath}/antsApplyTransforms -i ${MNI_IMAGE} -r ${FUNC_BRAIN} -t ${FUNC_REG_PREFIX}_1Warp.nii.gz ${FUNC_REG_PREFIX}_0GenericAffine.mat [${CUSTOM_REG_PREFIX}_0GenericAffine.mat,1] ${CUSTOM_REG_PREFIX}_1InverseWarp.nii.gz [${MNI_REG_PREFIX}_0GenericAffine.mat,1] ${MNI_REG_PREFIX}_1InverseWarp.nii.gz -o ${OUTPUT}
+
+exit
+
 
 if [[ ${PROJECT} == *new_memory* ]] || [[ ${PROJECT} == *example* ]] || [[ ${PROJECT} == *VSCA* ]]; then
 	CUSTOM_BRAIN=$MNI_BRAIN
