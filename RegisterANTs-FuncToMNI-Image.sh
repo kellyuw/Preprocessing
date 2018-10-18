@@ -25,9 +25,11 @@ if [[ ${IMAGE} != *stressdevlab* ]]; then
 	exit 1
 fi
 
-PROJECT_DIR=$(echo ${IMAGE} | awk -F "/" '{print $1"/"$2"/"$3"/"$4}')
 if [[ ${IMAGE} == *session* ]] || [[ ${IMAGE} == *month* ]]; then
   PROJECT_DIR=$(echo ${IMAGE} | awk -F "/" '{print $1"/"$2"/"$3"/"$4"/"$6}')
+	SUBJECT=$(echo ${IMAGE} | awk -F "/" '{print $5}')
+else
+	PROJECT_DIR=$(echo ${IMAGE} | awk -F "/" '{print $1"/"$2"/"$3"/"$4}')
 	SUBJECT=$(echo ${IMAGE} | awk -F "/" '{print $5}')
 fi
 
