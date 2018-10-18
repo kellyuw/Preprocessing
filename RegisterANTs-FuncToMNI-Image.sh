@@ -26,6 +26,11 @@ if [[ ${IMAGE} != *stressdevlab* ]]; then
 	exit 1
 fi
 
+PROJECT_DIR=$(echo ${IMAGE} | awk -F "/" '{print $1"/"$2"/"$3"/"$4}')
+if [[ ${IMAGE} == *session* ]] || [[ ${IMAGE} == *month* ]]; then
+  PROJECT_DIR=$(echo ${IMAGE} | awk -F "/" '{print $1"/"$2"/"$3"/"$4"/"$6}')
+fi
+
 MNI_BRAIN_MASK="/mnt/stressdevlab/scripts/Atlases/FSLMNI/MNI152_T1_2mm_filled_brain_mask.nii.gz"
 MNI_REG_PREFIX=$(cat ${PROJECT_DIR}/ProjectInfo.txt | grep MNI_REG_PREFIX | awk -F "=" '{print $2}')
 CUSTOM_BRAIN=$(cat ${PROJECT_DIR}/ProjectInfo.txt | grep CUSTOM_BRAIN | awk -F "=" '{print $2}')
