@@ -23,7 +23,7 @@ elif [[ ${FS_Dir} == *HOME* ]]; then
 	FS_Subject=${Subject}
 elif [[ ${FS_Dir} == *PING* ]]; then
 	Subject=$2
-	Project_Dir="/mnt/stressdevlab/PING/NewRestingState/New"
+	Project_Dir="/mnt/stressdevlab/PING/NewRestingState/Temp"
 	Subject_Dir=${Project_Dir}/${Subject}
 	FS_Subject=${Subject}
 else
