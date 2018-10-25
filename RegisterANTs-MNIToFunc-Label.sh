@@ -45,6 +45,7 @@ CUSTOM_REG_PREFIX=$(cat ${PROJECT_DIR}/ProjectInfo.txt | grep CUSTOM_REG_PREFIX 
 T1_BRAIN=$(cat ${PROJECT_DIR}/ProjectInfo.txt | grep T1_brain | awk -F "=" '{print $2}')
 FUNC_BRAIN=$(cat ${PROJECT_DIR}/ProjectInfo.txt | grep FUNC_BRAIN | awk -F "=" '{print $2}' | sed -e "s|TASK|${TASK}|g" -e "s|RUN|${RUN}|g")
 T1_REG_PREFIX=$(cat ${PROJECT_DIR}/ProjectInfo.txt | grep T1_REG_PREFIX | awk -F "=" '{print $2}' | sed -e "s|TASK|${TASK}|g" -e "s|RUN|${RUN}|g")
+T1_REG_TYPE=$(echo "${T1_REG_PREFIX:$((${#T1_REG_PREFIX}-1)):1}")
 SUBJECT_DIR=${PROJECT_DIR}/${SUBJECT}
 
 cd ${SUBJECT_DIR}
@@ -61,7 +62,11 @@ if [[ ! -d ${OUTPUT_DIR} ]]; then
 fi
 
 echo "Warping ${MNI_IMAGE} to ${RUN} space"
-${ANTSpath}/antsApplyTransforms -i ${MNI_IMAGE} -r ${FUNC_BRAIN} -t [${T1_REG_PREFIX}_0GenericAffine.mat,1] ${T1_REG_PREFIX}_1InverseWarp.nii.gz [${CUSTOM_REG_PREFIX}_0GenericAffine.mat,1] ${CUSTOM_REG_PREFIX}_1InverseWarp.nii.gz [${MNI_REG_PREFIX}_0GenericAffine.mat,1] ${MNI_REG_PREFIX}_1InverseWarp.nii.gz -o `dirname ${OUTPUT}`/`basename ${OUTPUT} .nii.gz`_UNTHR.nii.gz
+if [[ ${T1_REG_TYPE} == *r* ]]; then
+	${ANTSpath}/antsApplyTransforms -i ${MNI_IMAGE} -r ${FUNC_BRAIN} -t [${T1_REG_PREFIX}_0GenericAffine.mat,1] [${CUSTOM_REG_PREFIX}_0GenericAffine.mat,1] ${CUSTOM_REG_PREFIX}_1InverseWarp.nii.gz [${MNI_REG_PREFIX}_0GenericAffine.mat,1] ${MNI_REG_PREFIX}_1InverseWarp.nii.gz -o `dirname ${OUTPUT}`/`basename ${OUTPUT} .nii.gz`_UNTHR.nii.gz
+else
+	${ANTSpath}/antsApplyTransforms -i ${MNI_IMAGE} -r ${FUNC_BRAIN} -t [${T1_REG_PREFIX}_0GenericAffine.mat,1] ${T1_REG_PREFIX}_1InverseWarp.nii.gz [${CUSTOM_REG_PREFIX}_0GenericAffine.mat,1] ${CUSTOM_REG_PREFIX}_1InverseWarp.nii.gz [${MNI_REG_PREFIX}_0GenericAffine.mat,1] ${MNI_REG_PREFIX}_1InverseWarp.nii.gz -o `dirname ${OUTPUT}`/`basename ${OUTPUT} .nii.gz`_UNTHR.nii.gz
+fi
 
 echo "Warping ${MNI_IMAGE} to T1 space"
 ${ANTSpath}/antsApplyTransforms -i ${MNI_IMAGE} -r ${T1_BRAIN} -t  [${CUSTOM_REG_PREFIX}_0GenericAffine.mat,1] ${CUSTOM_REG_PREFIX}_1InverseWarp.nii.gz [${MNI_REG_PREFIX}_0GenericAffine.mat,1] ${MNI_REG_PREFIX}_1InverseWarp.nii.gz -o `dirname ${T1_BRAIN}`/`basename ${MNI_IMAGE} .nii.gz`_in_T1_space.nii.gz
