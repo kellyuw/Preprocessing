@@ -28,6 +28,9 @@ fi
 if [[ ${FUNC_IMAGE} == *session* ]] || [[ ${FUNC_IMAGE} == *month* ]]; then
   PROJECT_DIR=$(echo ${FUNC_IMAGE} | awk -F "/" '{print $1"/"$2"/"$3"/"$4"/"$6}')
 	SUBJECT=$(echo ${FUNC_IMAGE} | awk -F "/" '{print $5}')
+elif [[ ${FUNC_IMAGE} == *PING* ]]; then
+	PROJECT_DIR=$(echo ${FUNC_IMAGE} | awk -F "/" '{print $1"/"$2"/"$3"/"$4"/"$5}')
+	SUBJECT=$(echo ${FUNC_IMAGE} | awk -F "/" '{print $6}')
 else
 	PROJECT_DIR=$(echo ${FUNC_IMAGE} | awk -F "/" '{print $1"/"$2"/"$3"/"$4}')
 	SUBJECT=$(echo ${FUNC_IMAGE} | awk -F "/" '{print $5}')
