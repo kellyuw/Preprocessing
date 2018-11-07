@@ -62,7 +62,7 @@ if [[ ! -d ${OUTPUT_DIR} ]]; then
 fi
 
 echo "Warping ${MNI_IMAGE} to ${RUN} space"
-if [[ ${T1_REG_TYPE} == *r* ]]; then
+if [[ ${T1_REG_TYPE} == *_r* ]]; then
 	${ANTSpath}/antsApplyTransforms -i ${MNI_IMAGE} -r ${FUNC_BRAIN} -t [${T1_REG_PREFIX}_0GenericAffine.mat,1] [${CUSTOM_REG_PREFIX}_0GenericAffine.mat,1] ${CUSTOM_REG_PREFIX}_1InverseWarp.nii.gz [${MNI_REG_PREFIX}_0GenericAffine.mat,1] ${MNI_REG_PREFIX}_1InverseWarp.nii.gz -o ${OUTPUT}
 else
 	${ANTSpath}/antsApplyTransforms -i ${MNI_IMAGE} -r ${FUNC_BRAIN} -t [${T1_REG_PREFIX}_0GenericAffine.mat,1] ${T1_REG_PREFIX}_1InverseWarp.nii.gz [${CUSTOM_REG_PREFIX}_0GenericAffine.mat,1] ${CUSTOM_REG_PREFIX}_1InverseWarp.nii.gz [${MNI_REG_PREFIX}_0GenericAffine.mat,1] ${MNI_REG_PREFIX}_1InverseWarp.nii.gz -o ${OUTPUT}
