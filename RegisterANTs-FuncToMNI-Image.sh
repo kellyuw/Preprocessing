@@ -46,7 +46,7 @@ echo ${SUBJECTDIR} ${SUBJECT}
 pwd
 
 echo "Warping ${IMAGE} to MNI"
-if [[ ${T1_REG_TYPE} == *_r* ]]; then
+if [[ ${T1_REG_TYPE} == *r* ]]; then
 	${ANTSpat}/antsApplyTransforms -i ${IMAGE} -r ${MNI_BRAIN_MASK} -t ${MNI_REG_PREFIX}_1Warp.nii.gz ${MNI_REG_PREFIX}_0GenericAffine.mat ${CUSTOM_REG_PREFIX}_1Warp.nii.gz ${CUSTOM_REG_PREFIX}_0GenericAffine.mat ${T1_REG_PREFIX}_0GenericAffine.mat -o ${OUTPUT}
 else
 	${ANTSpath}/antsApplyTransforms -i ${IMAGE} -r ${MNI_BRAIN_MASK} -t ${MNI_REG_PREFIX}_1Warp.nii.gz ${MNI_REG_PREFIX}_0GenericAffine.mat ${CUSTOM_REG_PREFIX}_1Warp.nii.gz ${CUSTOM_REG_PREFIX}_0GenericAffine.mat ${T1_REG_PREFIX}_1Warp.nii.gz ${T1_REG_PREFIX}_0GenericAffine.mat -o ${OUTPUT}
