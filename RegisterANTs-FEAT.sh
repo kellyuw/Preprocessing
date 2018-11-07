@@ -48,8 +48,6 @@ else
 fi
 
 SUBJECT_TASK_DIR=`dirname ${FEAT_DIR}`
-TASK=`basename ${SUBJECT_TASK_DIR}`
-RUN=`basename ${FEAT_DIR} .nii.gz`
 SUBJECT_DIR=`dirname ${SUBJECT_TASK_DIR}`
 OUTPUT_DIR="${SUBJECT_TASK_DIR}/ROIMasks"
 MNI_BRAIN_MASK="/mnt/stressdevlab/scripts/Atlases/FSLMNI/MNI152_T1_2mm_filled_brain_mask.nii.gz"
