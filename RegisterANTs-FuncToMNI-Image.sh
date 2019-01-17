@@ -39,6 +39,7 @@ CUSTOM_BRAIN=$(cat ${PROJECT_DIR}/ProjectInfo.txt | grep CUSTOM_BRAIN | awk -F "
 CUSTOM_REG_PREFIX=$(cat ${PROJECT_DIR}/ProjectInfo.txt | grep CUSTOM_REG_PREFIX | awk -F "=" '{print $2}')
 FUNC_BRAIN=$(cat ${PROJECT_DIR}/ProjectInfo.txt | grep FUNC_BRAIN | awk -F "=" '{print $2}' | sed -e "s|TASK|${TASK}|g" -e "s|RUN|${RUN}|g")
 T1_REG_PREFIX=$(cat ${PROJECT_DIR}/ProjectInfo.txt | grep T1_REG_PREFIX | awk -F "=" '{print $2}' | sed -e "s|TASK|${TASK}|g" -e "s|RUN|${RUN}|g")
+T1_REG_TYPE=$(echo "${T1_REG_PREFIX:$((${#T1_REG_PREFIX}-1)):1}")
 SUBJECT_DIR=${PROJECT_DIR}/${SUBJECT}
 
 cd ${SUBJECT_DIR}
@@ -46,4 +47,8 @@ echo ${SUBJECTDIR} ${SUBJECT}
 pwd
 
 echo "Warping ${IMAGE} to MNI"
-${ANTSpath}/antsApplyTransforms -i ${IMAGE} -r ${MNI_BRAIN_MASK} -t ${MNI_REG_PREFIX}_1Warp.nii.gz ${MNI_REG_PREFIX}_0GenericAffine.mat ${CUSTOM_REG_PREFIX}_1Warp.nii.gz ${CUSTOM_REG_PREFIX}_0GenericAffine.mat ${T1_REG_PREFIX}_1Warp.nii.gz ${T1_REG_PREFIX}_0GenericAffine.mat -o ${OUTPUT}
+if [[ ${T1_REG_TYPE} == *r* ]]; then
+	${ANTSpath}/antsApplyTransforms -i ${IMAGE} -r ${MNI_BRAIN_MASK} -t ${MNI_REG_PREFIX}_1Warp.nii.gz ${MNI_REG_PREFIX}_0GenericAffine.mat ${CUSTOM_REG_PREFIX}_1Warp.nii.gz ${CUSTOM_REG_PREFIX}_0GenericAffine.mat ${T1_REG_PREFIX}_0GenericAffine.mat -o ${OUTPUT}
+else
+	${ANTSpath}/antsApplyTransforms -i ${IMAGE} -r ${MNI_BRAIN_MASK} -t ${MNI_REG_PREFIX}_1Warp.nii.gz ${MNI_REG_PREFIX}_0GenericAffine.mat ${CUSTOM_REG_PREFIX}_1Warp.nii.gz ${CUSTOM_REG_PREFIX}_0GenericAffine.mat ${T1_REG_PREFIX}_1Warp.nii.gz ${T1_REG_PREFIX}_0GenericAffine.mat -o ${OUTPUT}
+fi
