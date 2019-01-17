@@ -51,6 +51,7 @@ SUBJECT_TASK_DIR=`dirname ${FEAT_DIR}`
 SUBJECT_DIR=`dirname ${SUBJECT_TASK_DIR}`
 OUTPUT_DIR="${SUBJECT_TASK_DIR}/ROIMasks"
 MNI_BRAIN_MASK="/mnt/stressdevlab/scripts/Atlases/FSLMNI/MNI152_T1_2mm_filled_brain_mask.nii.gz"
+MNI_BRAIN="/usr/share/fsl/data/standard/MNI152_T1_2mm_brain.nii.gz"
 MNI_REG_PREFIX=$(cat ${PROJECT_DIR}/ProjectInfo.txt | grep MNI_REG_PREFIX | awk -F "=" '{print $2}')
 CUSTOM_BRAIN=$(cat ${PROJECT_DIR}/ProjectInfo.txt | grep CUSTOM_BRAIN | awk -F "=" '{print $2}')
 CUSTOM_REG_PREFIX=$(cat ${PROJECT_DIR}/ProjectInfo.txt | grep CUSTOM_REG_PREFIX | awk -F "=" '{print $2}')
