@@ -48,7 +48,17 @@ pwd
 
 echo "Warping ${IMAGE} to MNI"
 if [[ ${T1_REG_TYPE} == *r* ]]; then
-	${ANTSpath}/antsApplyTransforms -i ${IMAGE} -r ${MNI_BRAIN_MASK} -t ${MNI_REG_PREFIX}_1Warp.nii.gz ${MNI_REG_PREFIX}_0GenericAffine.mat ${CUSTOM_REG_PREFIX}_1Warp.nii.gz ${CUSTOM_REG_PREFIX}_0GenericAffine.mat ${T1_REG_PREFIX}_0GenericAffine.mat -o ${OUTPUT}
+	for f in ${MNI_REG_PREFIX}_1Warp.nii.gz ${MNI_REG_PREFIX}_0GenericAffine.mat ${CUSTOM_REG_PREFIX}_1Warp.nii.gz ${CUSTOM_REG_PREFIX}_0GenericAffine.mat ${T1_REG_PREFIX}_0GenericAffine.mat; do
+		if [[ ! -f ${f} ]]; then
+			exit
+		fi
+		${ANTSpath}/antsApplyTransforms -i ${IMAGE} -r ${MNI_BRAIN_MASK} -t ${MNI_REG_PREFIX}_1Warp.nii.gz ${MNI_REG_PREFIX}_0GenericAffine.mat ${CUSTOM_REG_PREFIX}_1Warp.nii.gz ${CUSTOM_REG_PREFIX}_0GenericAffine.mat ${T1_REG_PREFIX}_0GenericAffine.mat -o ${OUTPUT}
+	done
 else
-	${ANTSpath}/antsApplyTransforms -i ${IMAGE} -r ${MNI_BRAIN_MASK} -t ${MNI_REG_PREFIX}_1Warp.nii.gz ${MNI_REG_PREFIX}_0GenericAffine.mat ${CUSTOM_REG_PREFIX}_1Warp.nii.gz ${CUSTOM_REG_PREFIX}_0GenericAffine.mat ${T1_REG_PREFIX}_1Warp.nii.gz ${T1_REG_PREFIX}_0GenericAffine.mat -o ${OUTPUT}
+	for f in ${MNI_BRAIN_MASK} -t ${MNI_REG_PREFIX}_1Warp.nii.gz ${MNI_REG_PREFIX}_0GenericAffine.mat ${CUSTOM_REG_PREFIX}_1Warp.nii.gz ${CUSTOM_REG_PREFIX}_0GenericAffine.mat ${T1_REG_PREFIX}_1Warp.nii.gz ${T1_REG_PREFIX}_0GenericAffine.mat ; do
+		if [[ ! -f ${f} ]]; then
+			exit
+		fi
+		${ANTSpath}/antsApplyTransforms -i ${IMAGE} -r ${MNI_BRAIN_MASK} -t ${MNI_REG_PREFIX}_1Warp.nii.gz ${MNI_REG_PREFIX}_0GenericAffine.mat ${CUSTOM_REG_PREFIX}_1Warp.nii.gz ${CUSTOM_REG_PREFIX}_0GenericAffine.mat ${T1_REG_PREFIX}_1Warp.nii.gz ${T1_REG_PREFIX}_0GenericAffine.mat -o ${OUTPUT}
+	done
 fi
